@@ -152,200 +152,174 @@
     </div>
 </section>
 @endsection
-
 @section('scripts')
 <script>
-    $(function() {
-        // Search functionality
-        $('#searchStudent').on('keyup', function() {
-            const value = $(this).val().toLowerCase();
-            $('#all-students a').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
+$(function() {
+    // 🔍 Search students
+    $('#searchStudent').on('keyup', function() {
+        const value = $(this).val().toLowerCase();
+        $('#all-students a').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
-
-        // Load conversation when user is clicked
-        $('.user-conversation').on('click', function(e) {
-            e.preventDefault();
-            const userId = $(this).data('user-id');
-            const userName = $(this).data('user-name');
-            loadConversation(userId, userName);
-        });
-
-        // Load user information
-        $('#view-student-info').on('click', function() {
-            const userId = $('#recipient-id').val();
-            $.ajax({
-                url: `{{ route('faculty.messages.conversation', '') }}/${userId}`,
-                method: 'GET',
-                success: function(response) {
-                    let infoHtml = `
-                        <h6>${response.user.name}</h6>
-                        <p><strong>Student Number:</strong> ${response.user.student_number || 'N/A'}</p>
-                        <p><strong>Email:</strong> ${response.user.email || 'N/A'}</p>
-                        <hr>
-                        <h6>Enrolled Subjects:</h6>
-                        <ul>
-                    `;
-
-                    if (response.enrolledSubjects && response.enrolledSubjects.length > 0) {
-                        response.enrolledSubjects.forEach(subject => {
-                            infoHtml += `<li>${subject.subject_code} - ${subject.subject_name} (${subject.school_year}, ${subject.semester})</li>`;
-                        });
-                    } else {
-                        infoHtml += `<li>No enrolled subjects found</li>`;
-                    }
-
-                    infoHtml += `</ul>`;
-
-                    $('#student-info-content').html(infoHtml);
-                    $('#studentInfoModal').modal('show');
-                },
-                error: function(error) {
-                    console.error(error);
-                    toastr.error('Failed to load student information');
-                }
-            });
-        });
-
-        // Send message
-        $('#message-form').on('submit', function(e) {
-            e.preventDefault();
-            const recipientId = $('#recipient-id').val();
-            const message = $('#message-input').val().trim();
-
-            if (!recipientId || !message) {
-                return;
-            }
-
-            $.ajax({
-                url: '{{ route("faculty.messages.send") }}',
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    recipient_id: recipientId,
-                    message: message
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#message-input').val('');
-                        appendMessage(response.message, true);
-                        scrollToBottom();
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        toastr.error(xhr.responseJSON.error);
-                    } else {
-                        toastr.error('Failed to send message. Please try again.');
-                    }
-                }
-            });
-        });
-
-        // Function to load conversation
-        function loadConversation(userId, userName) {
-            $.ajax({
-                url: `{{ route('faculty.messages.conversation', '') }}/${userId}`,
-                method: 'GET',
-                success: function(response) {
-                    $('#no-conversation-selected').hide();
-                    $('#active-conversation').show();
-                    $('#conversation-title').text(userName);
-                    $('#recipient-id').val(userId);
-
-                    // Clear previous messages
-                    $('#conversation-messages').empty();
-
-                    // Add messages
-                    if (response.messages && response.messages.length > 0) {
-                        response.messages.forEach(message => {
-                            appendMessage(message, message.sender_id == {{ Auth::id() }});
-                        });
-                    } else {
-                        $('#conversation-messages').html(`
-                            <div class="text-center py-4">
-                                <p class="text-muted">No messages yet. Start the conversation!</p>
-                            </div>
-                        `);
-                    }
-
-                    scrollToBottom();
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        toastr.error(xhr.responseJSON.error);
-                    } else {
-                        toastr.error('Failed to load conversation. Please try again.');
-                    }
-                }
-            });
-        }
-
-        // Function to append message to conversation
-        function appendMessage(message, isOwn) {
-            const timestamp = new Date(message.created_at).toLocaleString();
-            let html = '';
-
-            if (isOwn) {
-                html = `
-                    <div class="direct-chat-msg right mb-3">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-right">You</span>
-                            <span class="direct-chat-timestamp float-left">${timestamp}</span>
-                        </div>
-                        <div class="direct-chat-text bg-primary text-white">
-                            ${message.message}
-                        </div>
-                    </div>
-                `;
-            } else {
-                html = `
-                    <div class="direct-chat-msg mb-3">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">Student</span>
-                            <span class="direct-chat-timestamp float-right">${timestamp}</span>
-                        </div>
-                        <div class="direct-chat-text">
-                            ${message.message}
-                        </div>
-                    </div>
-                `;
-            }
-
-            $('#conversation-messages').append(html);
-        }
-
-        // Function to scroll to bottom of conversation
-        function scrollToBottom() {
-            const conversationMessages = document.getElementById('conversation-messages');
-            conversationMessages.scrollTop = conversationMessages.scrollHeight;
-        }
-
-        // Periodically check for new messages (every 30 seconds)
-        setInterval(function() {
-            $.ajax({
-                url: '{{ route("faculty.messages.check") }}',
-                method: 'GET',
-                success: function(response) {
-                    if (response.count > 0) {
-                        // Reload current conversation if active
-                        const currentRecipient = $('#recipient-id').val();
-                        if (currentRecipient) {
-                            const userName = $('#conversation-title').text();
-                            loadConversation(currentRecipient, userName);
-                        }
-
-                        // Update notification in layout (if implemented)
-                        $('.message-count').text(response.count);
-
-                        if (response.count > 0) {
-                            toastr.info('You have new messages from students');
-                        }
-                    }
-                }
-            });
-        }, 30000);
     });
+
+    // 💬 Load conversation when student is clicked
+    $('.user-conversation').on('click', function(e) {
+        e.preventDefault();
+        const userId = $(this).data('user-id');
+        const userName = $(this).data('user-name');
+        loadConversation(userId, userName);
+    });
+
+    // 👤 View student info modal
+    $('#view-student-info').on('click', function() {
+        const userId = $('#recipient-id').val();
+        $.ajax({
+            url: `{{ url('faculty/messages') }}/${userId}`, // ✅ Correct faculty route
+            method: 'GET',
+            success: function(response) {
+                let infoHtml = `
+                    <h6>${response.user.name}</h6>
+                    <p><strong>Student Number:</strong> ${response.user.student_number || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${response.user.email || 'N/A'}</p>
+                    <hr>
+                    <h6>Enrolled Subjects:</h6>
+                    <ul>
+                `;
+
+                if (response.enrolledSubjects?.length) {
+                    response.enrolledSubjects.forEach(subject => {
+                        infoHtml += `<li>${subject.subject_code} - ${subject.subject_name} (${subject.school_year}, ${subject.semester})</li>`;
+                    });
+                } else {
+                    infoHtml += `<li>No enrolled subjects found</li>`;
+                }
+
+                infoHtml += `</ul>`;
+                $('#student-info-content').html(infoHtml);
+                $('#studentInfoModal').modal('show');
+            },
+            error: function(error) {
+                console.error(error);
+                toastr.error('Failed to load student information');
+            }
+        });
+    });
+
+    // ✉️ Send message
+    $('#message-form').on('submit', function(e) {
+        e.preventDefault();
+        const recipientId = $('#recipient-id').val();
+        const message = $('#message-input').val().trim();
+        if (!recipientId || !message) return;
+
+        $.ajax({
+            url: '{{ route("faculty.messages.send") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                recipient_id: recipientId,
+                message: message
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#message-input').val('');
+                    appendMessage(response.message, true);
+                    scrollToBottom();
+                }
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || 'Failed to send message. Please try again.');
+            }
+        });
+    });
+
+    // 📥 Load conversation
+    function loadConversation(userId, userName) {
+        $.ajax({
+            url: `{{ url('faculty/messages') }}/${userId}`, // ✅ Using full URL for faculty side
+            method: 'GET',
+            success: function(response) {
+                $('#no-conversation-selected').hide();
+                $('#active-conversation').show();
+                $('#conversation-title').text(userName);
+                $('#recipient-id').val(userId);
+                $('#conversation-messages').empty();
+
+                if (response.messages?.length) {
+                    response.messages.forEach(message => {
+                        appendMessage(message, message.sender_id == {{ Auth::id() }});
+                    });
+                } else {
+                    $('#conversation-messages').html(`
+                        <div class="text-center py-4">
+                            <p class="text-muted">No messages yet. Start the conversation!</p>
+                        </div>
+                    `);
+                }
+
+                scrollToBottom();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || 'Failed to load conversation. Please try again.');
+            }
+        });
+    }
+
+    // 🧱 Append message to chat
+    function appendMessage(message, isOwn) {
+        const timestamp = new Date(message.created_at).toLocaleString();
+        const html = isOwn
+            ? `
+                <div class="direct-chat-msg right mb-3">
+                    <div class="direct-chat-infos clearfix">
+                        <span class="direct-chat-name float-right">You</span>
+                        <span class="direct-chat-timestamp float-left">${timestamp}</span>
+                    </div>
+                    <div class="direct-chat-text bg-primary text-white">
+                        ${message.message}
+                    </div>
+                </div>
+            `
+            : `
+                <div class="direct-chat-msg mb-3">
+                    <div class="direct-chat-infos clearfix">
+                        <span class="direct-chat-name float-left">Student</span>
+                        <span class="direct-chat-timestamp float-right">${timestamp}</span>
+                    </div>
+                    <div class="direct-chat-text">
+                        ${message.message}
+                    </div>
+                </div>
+            `;
+
+        $('#conversation-messages').append(html);
+    }
+
+    // 🔽 Auto-scroll to bottom
+    function scrollToBottom() {
+        const el = document.getElementById('conversation-messages');
+        el.scrollTop = el.scrollHeight;
+    }
+
+    // 🔔 Periodically check for new messages
+    setInterval(function() {
+        $.ajax({
+            url: '{{ route("faculty.messages.check") }}',
+            method: 'GET',
+            success: function(response) {
+                if (response.count > 0) {
+                    const currentRecipient = $('#recipient-id').val();
+                    if (currentRecipient) {
+                        const userName = $('#conversation-title').text();
+                        loadConversation(currentRecipient, userName);
+                    }
+                    $('.message-count').text(response.count);
+                    toastr.info('You have new messages from students');
+                }
+            }
+        });
+    }, 30000);
+});
 </script>
 @endsection

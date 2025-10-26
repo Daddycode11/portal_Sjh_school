@@ -17,38 +17,44 @@ class LoginController extends Controller
 
     public function processLogin(Request $request)
     {
+        $request->validate([
+            'student_number' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+
         $credentials = $request->only('student_number', 'password');
 
-        // Add debug logging
+        // Debug logging
         Log::debug('Attempting login with: ' . $request->student_number);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->has('remember'))) {
             $user = Auth::user();
+
             Log::debug('Login successful for: ' . $user->name . ' (Role: ' . $user->user_role . ')');
 
-            if ($user->user_role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->user_role === 'faculty') {
-                // Changed from admin.faculty.index to faculty.dashboard
-                return redirect()->route('faculty.dashboard');
-            } elseif ($user->user_role === 'client') {
-                return redirect()->route('client.dashboard');
+            // Redirect based on role
+            switch ($user->user_role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'faculty':
+                    return redirect()->route('faculty.dashboard');
+                case 'client':
+                    return redirect()->route('client.dashboard');
+                case 'principal': // ito yung additional na principal account
+                    return redirect()->route('principal.dashboard');
+                default:
+                    Auth::logout();
+                    return back()->withErrors(['student_number' => 'Unauthorized role.']);
             }
         } else {
             Log::debug('Login failed for: ' . $request->student_number);
-        }
 
-        return back()->withErrors([
-            'student_number' => 'The provided credentials do not match our records.',
-        ]);
+            return back()->withErrors([
+                'student_number' => 'The provided credentials do not match our records.',
+            ]);
+        }
     }
 
-    /**
-     * Log the user out of the application.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function logout(Request $request)
     {
         Session::flush();

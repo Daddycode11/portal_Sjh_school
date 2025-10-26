@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientController extends Controller
 {
@@ -592,4 +593,95 @@ class ClientController extends Controller
 
         return Storage::download($syllabus->file_path, $syllabus->original_filename);
     }
+    // Then near the bottom of the controller:
+public function exportGradesPDF()
+{
+    $user = Auth::user();
+
+    // Fetch grades using the same logic as viewGrades()
+    $enrollments = DB::table('section_student')
+        ->where('student_id', $user->id)
+        ->join('sections', 'section_student.section_id', '=', 'sections.id')
+        ->join('section_subject', function ($join) {
+            $join->on('section_student.section_id', '=', 'section_subject.section_id')
+                 ->on('section_student.school_year', '=', 'section_subject.school_year')
+                 ->on('section_student.semester', '=', 'section_subject.semester');
+        })
+        ->join('subjects', 'section_subject.subject_id', '=', 'subjects.id')
+        ->join('users as faculty', 'section_subject.faculty_id', '=', 'faculty.id')
+        ->select(
+            'section_subject.section_id',
+            'section_subject.subject_id',
+            'section_student.school_year',
+            'section_student.semester',
+            'sections.name as section_name',
+            'subjects.name as subject_name',
+            'subjects.code as subject_code',
+            'faculty.name as faculty_name',
+            'faculty.id as faculty_id'
+        )
+        ->get();
+
+    $subjectGrades = [];
+
+    foreach ($enrollments as $enrollment) {
+        $assessments = DB::table('assessments')
+            ->where('subject_id', $enrollment->subject_id)
+            ->where('faculty_id', $enrollment->faculty_id)
+            ->where('school_year', $enrollment->school_year)
+            ->where('semester', $enrollment->semester)
+            ->get();
+
+        if ($assessments->isEmpty()) {
+            continue;
+        }
+
+        $gradingSystem = DB::table('grading_systems')
+            ->where('subject_id', $enrollment->subject_id)
+            ->first() ?? (object)[
+                'quiz_percentage' => 25,
+                'unit_test_percentage' => 25,
+                'activity_percentage' => 25,
+                'exam_percentage' => 25
+            ];
+
+        $midtermGrade = $this->calculateTermGrade('midterm', $user->id, $assessments, $gradingSystem);
+        $finalGrade = $this->calculateTermGrade('final', $user->id, $assessments, $gradingSystem);
+        $overallGrade = ($midtermGrade + $finalGrade) / 2;
+
+        $subjectGrades[] = [
+            'subject_code' => $enrollment->subject_code,
+            'subject_name' => $enrollment->subject_name,
+            'section_name' => $enrollment->section_name,
+            'faculty_name' => $enrollment->faculty_name,
+            'school_year' => $enrollment->school_year,
+            'semester' => $enrollment->semester,
+            'midterm_grade' => $midtermGrade,
+            'final_grade' => $finalGrade,
+            'overall_grade' => $overallGrade,
+            'status' => $overallGrade >= 75 ? 'Passing' : 'Failing',
+        ];
+    }
+
+    // Calculate summary stats
+    $totalSubjects = count($subjectGrades);
+    $totalGrades = array_sum(array_column($subjectGrades, 'overall_grade'));
+    $gpa = $totalSubjects ? $totalGrades / $totalSubjects : 0;
+
+    $passingCount = count(array_filter($subjectGrades, fn($g) => $g['overall_grade'] >= 75));
+    $performancePercentage = $totalSubjects ? ($passingCount / $totalSubjects) * 100 : 0;
+
+
+ $pdf = Pdf::loadView('client.gradespdf', [
+        'user' => $user,
+        'subjectGrades' => $subjectGrades,
+        'gpa' => $gpa,
+        'totalSubjects' => $totalSubjects,
+        'passingCount' => $passingCount,
+        'performancePercentage' => $performancePercentage
+    ])->setPaper('A4', 'landscape');
+
+    // Force download instead of viewing in browser
+    return $pdf->download('Grade_Report_' . $user->name . '.pdf');
+}
 }

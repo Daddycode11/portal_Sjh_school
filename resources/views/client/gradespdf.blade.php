@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grade Report - {{ $user->name }}</title>
+    <style>
+        @page {
+            margin: 1.2cm;
+        }
+        body {
+            font-family: "DejaVu Sans", sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        .header {
+            border: 2px solid #000;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .header img {
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            width: 70px;
+            height: 70px;
+        }
+        .header h1 {
+            font-size: 18px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        .header h2 {
+            font-size: 14px;
+            margin: 3px 0;
+            font-weight: normal;
+        }
+        .header p {
+            font-size: 12px;
+            margin: 2px 0;
+        }
+        .info {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        .info strong {
+            width: 150px;
+            display: inline-block;
+        }
+        .summary {
+            margin-top: 10px;
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+        .summary th, .summary td {
+            border: 1px solid #999;
+            padding: 6px;
+        }
+        .summary th {
+            background-color: #f0f0f0;
+        }
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        .grades-table th, .grades-table td {
+            border: 1px solid #666;
+            padding: 6px;
+            text-align: center;
+        }
+        .grades-table th {
+            background-color: #dce6f1;
+            font-weight: bold;
+        }
+        .passing {
+            color: green;
+            font-weight: bold;
+        }
+        .failing {
+            color: red;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            font-size: 10px;
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="{{ public_path('images/sjnshs_logo.png') }}" alt="School Logo">
+        <h1>San Jose National High School</h1>
+        <h2>Official Grade Report</h2>
+        <p>Academic Year: {{ $subjectGrades[0]['school_year'] ?? 'N/A' }} | Semester: {{ $subjectGrades[0]['semester'] ?? 'N/A' }}</p>
+    </div>
+
+    <!-- STUDENT INFO -->
+    <div class="info">
+        <p><strong>Student Name:</strong> {{ $user->name }}</p>
+        <p><strong>Date Generated:</strong> {{ now()->format('F d, Y') }}</p>
+    </div>
+
+    <!-- PERFORMANCE SUMMARY -->
+    <table class="summary">
+        <thead>
+            <tr>
+                <th>Overall Average</th>
+                <th>Subjects Passed</th>
+                <th>Subjects Failed</th>
+                <th>Overall Performance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ number_format($gpa, 2) }}</td>
+                <td>{{ $passingCount }} / {{ $totalSubjects }}</td>
+                <td>{{ $totalSubjects - $passingCount }} / {{ $totalSubjects }}</td>
+                <td>{{ number_format($performancePercentage, 0) }}%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- GRADES TABLE -->
+    <table class="grades-table">
+        <thead>
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Section</th>
+                <th>Faculty</th>
+                <th>Midterm</th>
+                <th>Final</th>
+                <th>Overall</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($subjectGrades as $grade)
+                <tr>
+                    <td>{{ $grade['subject_code'] }}</td>
+                    <td>{{ $grade['subject_name'] }}</td>
+                    <td>{{ $grade['section_name'] }}</td>
+                    <td>{{ $grade['faculty_name'] }}</td>
+                    <td>{{ number_format($grade['midterm_grade'], 2) }}</td>
+                    <td>{{ number_format($grade['final_grade'], 2) }}</td>
+                    <td>{{ number_format($grade['overall_grade'], 2) }}</td>
+                    <td class="{{ $grade['overall_grade'] >= 75 ? 'passing' : 'failing' }}">
+                        {{ $grade['overall_grade'] >= 75 ? 'Passing' : 'Failing' }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8">No grade records available.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <footer>
+        <p>Generated by the San Jose National High School Student Portal | {{ now()->format('Y') }}</p>
+    </footer>
+</body>
+</html>

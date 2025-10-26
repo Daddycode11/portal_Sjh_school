@@ -349,224 +349,165 @@
     </div>
 </div>
 @endsection
-
 @section('scripts')
 <script>
-    $(document).ready(function() {
-        let currentRecipientId = null;
-        let currentRecipientName = '';
-        let currentRecipientSubject = '';
-        const userId = {{ Auth::id() }};
+$(document).ready(function() {
+    let currentRecipientId = null;
+    const userId = {{ Auth::id() }};
 
-        // Check if faculty parameter is in URL (coming from class page)
-        const urlParams = new URLSearchParams(window.location.search);
-        const facultyParam = urlParams.get('faculty');
+    // Check if faculty parameter is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const facultyParam = urlParams.get('faculty');
+    if (facultyParam) {
+        $(`.contact-item[data-id="${facultyParam}"]`).click();
+    }
 
-        if (facultyParam) {
-            // Find and click on the faculty contact
-            $(`.contact-item[data-id="${facultyParam}"]`).click();
-        }
+    // Handle contact click
+    $('.contact-item').on('click', function() {
+        $('.contact-item').removeClass('active');
+        $(this).addClass('active');
 
-        // Handle contact click
-        $('.contact-item').on('click', function(e) {
-            // Update active state
-            $('.contact-item').removeClass('active');
-            $(this).addClass('active');
+        currentRecipientId = $(this).data('id');
+        const currentRecipientName = $(this).find('.name').text();
+        const currentRecipientSubject = $(this).data('subject');
 
-            // Get recipient info
-            currentRecipientId = $(this).data('id');
-            currentRecipientName = $(this).find('.name').text();
-            currentRecipientSubject = $(this).data('subject');
+        $('#chat-recipient-name').text(currentRecipientName);
+        $('#chat-recipient-subject').text(currentRecipientSubject);
+        $('#chat-recipient-avatar').text(currentRecipientName.charAt(0).toUpperCase());
 
-            // Update UI
-            $('#chat-recipient-name').text(currentRecipientName);
-            $('#chat-recipient-subject').text(currentRecipientSubject);
-            $('#chat-recipient-avatar').text(currentRecipientName.charAt(0).toUpperCase());
+        $('#empty-chat-container').addClass('d-none');
+        $('#chat-container').removeClass('d-none');
 
-            // Show chat area, hide empty state
-            $('#empty-chat-container').addClass('d-none');
-            $('#chat-container').removeClass('d-none');
-
-            // Load conversation
-            loadConversation(currentRecipientId);
-
-            // Focus on message input
-            $('#message-text').focus();
-        });
-
-        // Search contacts functionality
-        $('#search-contact').on('keyup', function() {
-            const searchTerm = $(this).val().toLowerCase();
-
-            $('.contact-item').each(function() {
-                const name = $(this).find('.name').text().toLowerCase();
-                const preview = $(this).find('.preview').text().toLowerCase();
-
-                if (name.includes(searchTerm) || preview.includes(searchTerm)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
-
-        // Load conversation function
-        function loadConversation(recipientId) {
-            $.ajax({
-                url: `{{ route('client.messages.conversation', '') }}/${recipientId}`,
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    displayMessages(data.messages);
-                },
-                error: function(xhr) {
-                    console.error('Error loading conversation:', xhr);
-
-                    // Show error message in chat area
-                    $('#messages-container').html(`
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-circle fa-3x mb-3 text-danger"></i>
-                            <p>Error loading messages. Please try again.</p>
-                        </div>
-                    `);
-                }
-            });
-        }
-
-        // Display messages function
-        function displayMessages(messages) {
-            const container = $('#messages-container');
-            container.empty();
-
-            if (messages.length === 0) {
-                container.html(`
-                    <div class="empty-state">
-                        <i class="far fa-comment-dots fa-3x mb-3 text-gray-300"></i>
-                        <p>No messages yet. Start the conversation!</p>
-                    </div>
-                `);
-                return;
-            }
-
-            let currentDate = null;
-            let currentSender = null;
-            let messageGroup = null;
-
-            messages.forEach(function(message, index) {
-                const messageDate = new Date(message.created_at);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                let dateLabel;
-
-                // Format date for display
-                if (messageDate.toDateString() === today.toDateString()) {
-                    dateLabel = 'Today';
-                } else if (messageDate.toDateString() === yesterday.toDateString()) {
-                    dateLabel = 'Yesterday';
-                } else {
-                    dateLabel = messageDate.toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: messageDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-                    });
-                }
-
-                // Add date separator if needed
-                if (currentDate !== dateLabel) {
-                    container.append(`
-                        <div class="text-center my-3">
-                            <span class="badge badge-light px-3 py-2">${dateLabel}</span>
-                        </div>
-                    `);
-                    currentDate = dateLabel;
-                    currentSender = null;
-                }
-
-                // Determine message type
-                const isOutgoing = message.sender_id == userId;
-                const messageClass = isOutgoing ? 'outgoing' : 'incoming';
-
-                // Create message element
-                const messageTime = messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const messageElement = $(`
-                    <div class="message ${messageClass}">
-                        <div class="content">${message.message}</div>
-                        <div class="time">${messageTime}</div>
-                    </div>
-                `);
-
-                // Add to container
-                container.append(messageElement);
-            });
-
-            // Scroll to bottom
-            container.scrollTop(container.prop('scrollHeight'));
-        }
-
-        // Handle message form submission
-        $('#message-form').on('submit', function(e) {
-            e.preventDefault();
-
-            if (!currentRecipientId) {
-                alert('Please select a recipient first.');
-                return;
-            }
-
-            const messageText = $('#message-text').val().trim();
-
-            if (!messageText) {
-                return;
-            }
-
-            // Send message
-            $.ajax({
-                url: '{{ route('client.messages.send') }}',
-                type: 'POST',
-                data: {
-                    recipient_id: currentRecipientId,
-                    message: messageText,
-                    _token: '{{ csrf_token() }}'
-                },
-                dataType: 'json',
-                beforeSend: function() {
-                    // Disable input during sending
-                    $('#message-text').prop('disabled', true);
-                },
-                success: function(data) {
-                    if (data.success) {
-                        // Clear input
-                        $('#message-text').val('');
-
-                        // Reload conversation to show new message
-                        loadConversation(currentRecipientId);
-                    } else {
-                        alert(data.error || 'Error sending message. Please try again.');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error sending message:', xhr);
-
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        alert(xhr.responseJSON.error);
-                    } else {
-                        alert('Error sending message. Please try again.');
-                    }
-                },
-                complete: function() {
-                    // Re-enable input
-                    $('#message-text').prop('disabled', false).focus();
-                }
-            });
-        });
-
-        // Set up auto-refresh for active conversation
-        setInterval(function() {
-            if (currentRecipientId) {
-                loadConversation(currentRecipientId);
-            }
-        }, 10000); // Refresh every 10 seconds
+        loadConversation(currentRecipientId);
+        $('#message-text').focus();
     });
+
+    // Search contacts
+    $('#search-contact').on('keyup', function() {
+        const searchTerm = $(this).val().toLowerCase();
+        $('.contact-item').each(function() {
+            const name = $(this).find('.name').text().toLowerCase();
+            const preview = $(this).find('.preview').text().toLowerCase();
+            $(this).toggle(name.includes(searchTerm) || preview.includes(searchTerm));
+        });
+    });
+
+    // Load conversation
+    function loadConversation(recipientId) {
+        $.ajax({
+            url: `{{ route('client.messages.conversation', ['userId' => '__id__']) }}`.replace('__id__', recipientId),
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                displayMessages(data.messages);
+            },
+            error: function(xhr) {
+                console.error('Error loading conversation:', xhr);
+                $('#messages-container').html(`
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle fa-3x mb-3 text-danger"></i>
+                        <p>Error loading messages. Please try again.</p>
+                    </div>
+                `);
+            }
+        });
+    }
+
+    // Display messages
+    function displayMessages(messages) {
+        const container = $('#messages-container');
+        container.empty();
+
+        if (messages.length === 0) {
+            container.html(`
+                <div class="empty-state">
+                    <i class="far fa-comment-dots fa-3x mb-3 text-gray-300"></i>
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+            `);
+            return;
+        }
+
+        let currentDate = null;
+        messages.forEach(function(message) {
+            const messageDate = new Date(message.created_at);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            let dateLabel;
+            if (messageDate.toDateString() === today.toDateString()) dateLabel = 'Today';
+            else if (messageDate.toDateString() === yesterday.toDateString()) dateLabel = 'Yesterday';
+            else dateLabel = messageDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+            if (currentDate !== dateLabel) {
+                container.append(`<div class="text-center my-3"><span class="badge badge-light px-3 py-2">${dateLabel}</span></div>`);
+                currentDate = dateLabel;
+            }
+
+            const isOutgoing = message.sender_id == userId;
+            const messageClass = isOutgoing ? 'outgoing' : 'incoming';
+            const messageTime = messageDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            container.append(`
+                <div class="message ${messageClass}">
+                    <div class="content">${message.message}</div>
+                    <div class="time">${messageTime}</div>
+                </div>
+            `);
+        });
+
+        container.scrollTop(container.prop('scrollHeight'));
+    }
+
+    // Send message
+    $('#message-form').on('submit', function(e) {
+        e.preventDefault();
+        if (!currentRecipientId) {
+            alert('Please select a recipient first.');
+            return;
+        }
+
+        const messageText = $('#message-text').val().trim();
+        if (!messageText) return;
+
+        $.ajax({
+            url: '{{ route('client.messages.send') }}',
+            type: 'POST',
+            data: {
+                recipient_id: currentRecipientId,
+                message: messageText,
+                _token: '{{ csrf_token() }}'
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                $('#message-text').prop('disabled', true);
+            },
+            success: function(data) {
+                if (data.success) {
+                    $('#message-text').val('');
+                    loadConversation(currentRecipientId);
+                } else {
+                    alert(data.error || 'Error sending message. Please try again.');
+                }
+            },
+            error: function(xhr) {
+                console.error('Error sending message:', xhr);
+                alert(xhr.responseJSON?.error || 'Error sending message. Please try again.');
+            },
+            complete: function() {
+                $('#message-text').prop('disabled', false).focus();
+            }
+        });
+    });
+
+    // Auto-refresh
+    setInterval(function() {
+        if (currentRecipientId) {
+            loadConversation(currentRecipientId);
+        }
+    }, 10000);
+});
 </script>
 @endsection
+

@@ -7,6 +7,11 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Faculty\FacultyController;
 use App\Http\Controllers\Faculty\FacultyMessagesController;
+use App\Http\Controllers\Principal\PrincipalDashboardController;
+use App\Http\Controllers\PrincipalController;
+use App\Http\Controllers\Principal\TeacherController;
+use App\Http\Controllers\Principal\StudentController;
+use App\Http\Controllers\Client\GradeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +25,7 @@ Route::get('/', [HomeController::class, 'index'])->name('welcome');
 | Login Logic
 |--------------------------------------------------------------------------
 */
+// Authentication
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('login', [LoginController::class, 'processLogin'])->name('login.submit');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
@@ -163,3 +169,30 @@ Route::prefix('student')
         // Syllabus download
         Route::get('/syllabus/{id}/download', [ClientController::class, 'downloadSyllabus'])->name('syllabus.download');
     });
+/*
+|--------------------------------------------------------------------------
+| principal Logic
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'principal'])->group(function () {
+    Route::get('/principal/dashboard', [PrincipalController::class, 'dashboard'])
+        ->name('principal.dashboard');
+});
+
+Route::prefix('principal')->name('principal.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [PrincipalController::class, 'dashboard'])->name('dashboard');
+
+    // Dynamic pages
+    Route::get('/teachers', [PrincipalController::class, 'teachers'])->name('teachers.index');
+    Route::get('/students', [PrincipalController::class, 'students'])->name('students.index');
+    Route::get('/sections', [PrincipalController::class, 'sections'])->name('sections.index');
+    Route::get('/subjects', [PrincipalController::class, 'subjects'])->name('subjects.index');
+    Route::get('/reports', [PrincipalController::class, 'reports'])->name('reports.index');
+    Route::get('/settings', [PrincipalController::class, 'settings'])->name('settings');
+});
+
+
+Route::get('/client/grades/export-pdf', [ClientController::class, 'exportGradesPDF'])
+    ->name('client.grades.exportPDF');

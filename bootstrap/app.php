@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Middleware\PrincipalMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\FacultyMiddleware;
 use App\Http\Middleware\ClientMiddleware;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminMiddleware::class,
             'faculty' => FacultyMiddleware::class,
             'client' => ClientMiddleware::class,
+             'principal' => PrincipalMiddleware::class, // ✅ Added for principal account
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
