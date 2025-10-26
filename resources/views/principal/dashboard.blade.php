@@ -1,6 +1,83 @@
 @extends('principal.layout.app')
 
 @section('content')
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* 🌿 Global Styles */
+body {
+    background-color: #f4fff6; /* Very light mint */
+    font-family: 'Poppins', 'Roboto', sans-serif;
+}
+
+/* 🌿 Dashboard Card Styles */
+.small-box {
+    color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+.small-box:hover {
+    transform: translateY(-5px);
+}
+
+/* Gradient Shades of Green per Card */
+.bg-info {
+    background: linear-gradient(135deg, #A5D6A7, #81C784);
+}
+.bg-success {
+    background: linear-gradient(135deg, #81C784, #66BB6A);
+}
+.bg-warning {
+    background: linear-gradient(135deg, #66BB6A, #43A047);
+}
+.bg-danger {
+    background: linear-gradient(135deg, #43A047, #2E7D32);
+}
+
+/* Card Icons */
+.small-box .icon {
+    color: rgba(255,255,255,0.4);
+    font-size: 60px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+/* 🌿 Card Containers */
+.card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+.card-header {
+    background-color: #388E3C !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.card-body {
+    background-color: #ffffff;
+}
+
+/* 🌿 Buttons */
+.btn {
+    border-radius: 20px;
+    background-color: #66BB6A;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn:hover {
+    background-color: #81C784;
+    transform: translateY(-2px);
+}
+</style>
+
 <div class="row">
     <!-- Students -->
     <div class="col-lg-3 col-6">
@@ -47,13 +124,14 @@
     </div>
 </div>
 
+<!-- Cards Section -->
 <div class="row mt-4">
     <div class="col-md-6">
         <div class="card card-primary">
             <div class="card-header"><h3 class="card-title">📊 School Performance Overview</h3></div>
             <div class="card-body">
                 <p>Includes attendance, grades, and behavior summaries.</p>
-                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <a href="#" class="btn btn-sm">View Details</a>
             </div>
         </div>
     </div>
@@ -63,7 +141,7 @@
             <div class="card-header"><h3 class="card-title">📈 Reports Generator</h3></div>
             <div class="card-body">
                 <p>Generate automated reports per quarter or school year.</p>
-                <a href="#" class="btn btn-success btn-sm">Generate Report</a>
+                <a href="#" class="btn btn-sm">Generate Report</a>
             </div>
         </div>
     </div>
@@ -75,7 +153,7 @@
             <div class="card-header"><h3 class="card-title">📅 School Calendar & Events</h3></div>
             <div class="card-body">
                 <p>Manage and schedule academic events and activities.</p>
-                <a href="#" class="btn btn-warning btn-sm">Open Calendar</a>
+                <a href="#" class="btn btn-sm">Open Calendar</a>
             </div>
         </div>
     </div>
@@ -85,7 +163,7 @@
             <div class="card-header"><h3 class="card-title">💬 Internal Messaging System</h3></div>
             <div class="card-body">
                 <p>Communicate with faculty and students in real time.</p>
-                <a href="#" class="btn btn-info btn-sm">Open Messages</a>
+                <a href="#" class="btn btn-sm">Open Messages</a>
             </div>
         </div>
     </div>

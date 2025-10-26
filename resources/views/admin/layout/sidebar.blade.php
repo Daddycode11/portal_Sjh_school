@@ -62,6 +62,27 @@
                         <p>Faculty Assignments</p>
                     </a>
                 </li>
+                <!-- Announcements -->
+<!-- Announcements -->
+<li class="nav-item">
+    <a href="{{ route('admin.announcements.index') }}"
+        class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}"
+        style="{{ request()->routeIs('admin.announcements.*') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+        <i class="nav-icon fas fa-bullhorn text-white"></i>
+        <p>Announcements</p>
+    </a>
+</li>
+                <!-- Login History -->
+<li class="nav-item">
+    <a href="{{ route('admin.loginHistory') }}"
+        class="nav-link {{ request()->routeIs('admin.loginHistory') ? 'active' : '' }}"
+        style="{{ request()->routeIs('admin.loginHistory') ? 'background-color: #66BB6A; color: #000;' : 'color: #fff;' }}">
+        <i class="nav-icon fas fa-history text-white"></i>
+        <p>Login History</p>
+    </a>
+</li>
+
+
 
                 <!-- Logout -->
                 <li class="nav-item mt-4">

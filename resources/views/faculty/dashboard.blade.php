@@ -49,7 +49,7 @@
                 <div class="row">
                     <!-- My Classes -->
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
+                        <div class="small-box" style="background-color:#A5D6A7; border-radius:12px;">
                             <div class="inner">
                                 <h3>{{ $assignedClasses->count() }}</h3>
                                 <p>My Classes</p>
@@ -57,14 +57,14 @@
                             <div class="icon">
                                 <i class="fas fa-chalkboard-teacher"></i>
                             </div>
-                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer">
+                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer" style="border-radius:12px; background-color:#66BB6A; color:#fff;">
                                 View Classes <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
                     <!-- Total Students -->
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
+                        <div class="small-box" style="background-color:#66BB6A; border-radius:12px;">
                             <div class="inner">
                                 <h3>{{ $studentCount }}</h3>
                                 <p>Total Students</p>
@@ -72,14 +72,14 @@
                             <div class="icon">
                                 <i class="fas fa-user-graduate"></i>
                             </div>
-                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer">
+                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer" style="border-radius:12px; background-color:#81C784; color:#fff;">
                                 Student Info <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
                     <!-- Syllabi Uploaded -->
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
+                        <div class="small-box" style="background-color:#43A047; border-radius:12px;">
                             <div class="inner">
                                 <h3>{{ $syllabiCount }}</h3>
                                 <p>Syllabi Uploaded</p>
@@ -87,14 +87,14 @@
                             <div class="icon">
                                 <i class="fas fa-file-upload"></i>
                             </div>
-                            <a href="{{ route('faculty.syllabus.index') }}" class="small-box-footer">
+                            <a href="{{ route('faculty.syllabus.index') }}" class="small-box-footer" style="border-radius:12px; background-color:#66BB6A; color:#fff;">
                                 View Syllabi <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- Pending Tasks (Example: difference between classes & syllabi) -->
+                    <!-- Pending Tasks -->
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-danger">
+                        <div class="small-box" style="background-color:#2E7D32; border-radius:12px;">
                             <div class="inner">
                                 <h3>{{ $assignedClasses->count() - $syllabiCount }}</h3>
                                 <p>Pending Tasks</p>
@@ -102,7 +102,7 @@
                             <div class="icon">
                                 <i class="fas fa-tasks"></i>
                             </div>
-                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer">
+                            <a href="{{ route('faculty.classes.index') }}" class="small-box-footer" style="border-radius:12px; background-color:#66BB6A; color:#fff;">
                                 View Tasks <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
@@ -113,8 +113,8 @@
                 <div class="row">
                     <!-- Classes Table -->
                     <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-header border-transparent">
+                        <div class="card" style="border-radius:12px;">
+                            <div class="card-header" style="background-color:#66BB6A; color:#fff; font-weight:500; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
                                 <h3 class="card-title">My Classes</h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -149,7 +149,7 @@
                                                         'subjectId' => $class->subject_id,
                                                         'schoolYear' => $class->school_year,
                                                         'semester' => $class->semester
-                                                    ]) }}" class="btn btn-sm btn-primary">
+                                                    ]) }}" class="btn btn-sm" style="background-color:#66BB6A; color:#fff; border-radius:12px;">
                                                         <i class="fas fa-eye"></i> View
                                                     </a>
                                                 </td>
@@ -164,7 +164,7 @@
                                 </div>
                             </div>
                             <div class="card-footer clearfix">
-                                <a href="{{ route('faculty.classes.index') }}" class="btn btn-sm btn-info float-right">
+                                <a href="{{ route('faculty.classes.index') }}" class="btn btn-sm" style="background-color:#66BB6A; color:#fff; border-radius:12px; float:right;">
                                     View All Classes
                                 </a>
                             </div>
@@ -173,15 +173,15 @@
 
                     <!-- Recent Activities -->
                     <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">
+                        <div class="card" style="border-radius:12px;">
+                            <div class="card-header" style="background-color:#66BB6A; color:#fff; font-weight:500;">
                                 <h3 class="card-title">Recent Activities</h3>
                             </div>
                             <div class="card-body p-0">
                                 <ul class="products-list product-list-in-card pl-2 pr-2">
                                     @if(isset($recentActivities) && count($recentActivities) > 0)
                                         @foreach($recentActivities as $activity)
-                                            <li class="item">
+                                            <li class="item" style="border-bottom:1px solid #E0E0E0; padding:10px 0;">
                                                 <div class="product-info">
                                                     <a href="javascript:void(0)" class="product-title">
                                                         {{ $activity['description'] }}
@@ -201,14 +201,35 @@
                                 </ul>
                             </div>
                             <div class="card-footer text-center">
-                                <a href="{{ route('faculty.classes.index') }}" class="uppercase">
+                                <a href="{{ route('faculty.classes.index') }}" class="uppercase" style="color:#388E3C; font-weight:500;">
                                     View All Activities
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- End Row -->
+
+                <!-- Announcements -->
+                <div class="card" style="border-radius:12px;">
+                    <div class="card-header" style="background-color:#388E3C; color:#fff;">
+                        <h3 class="card-title"><i class="fas fa-bullhorn"></i> Announcements</h3>
+                    </div>
+                    <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                        @forelse($announcements as $announcement)
+                            <div class="border-bottom pb-2 mb-3">
+                                <h5 class="text-success mb-1">{{ $announcement->title }}</h5>
+                                <p class="text-muted small">{{ $announcement->content }}</p>
+                                <small class="text-secondary">
+                                    <i class="fas fa-clock"></i>
+                                    {{ \Carbon\Carbon::parse($announcement->posted_at)->format('F d, Y h:i A') }}
+                                </small>
+                            </div>
+                        @empty
+                            <p class="text-muted text-center">No announcements available.</p>
+                        @endforelse
+                    </div>
+                </div>
+
             </div>
         </section>
     </div>
@@ -222,5 +243,12 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Poppins','Roboto',sans-serif; background-color:#F5FFFA; }
+.navbar { background-color:#388E3C !important; box-shadow:0 2px 4px rgba(0,0,0,0.1); color:#fff; }
+</style>
 </body>
 </html>

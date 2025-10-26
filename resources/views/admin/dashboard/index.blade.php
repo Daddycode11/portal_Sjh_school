@@ -1,5 +1,132 @@
 @include('admin.layout.header')
 
+<head>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* 🌱 General Page Styling */
+        body {
+            background-color: #f4fff7; /* light mint */
+            font-family: 'Poppins', 'Roboto', sans-serif;
+        }
+
+        /* 🌳 Header Bar */
+        .main-header.navbar {
+            background-color: #388E3C !important; /* Medium green */
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-header .nav-link,
+        .main-header .navbar-brand {
+            color: #ffffff !important;
+        }
+
+        /* 🌈 Dashboard Cards (Green Gradient Tones) */
+        .small-box {
+            border-radius: 15px !important;
+            color: #fff !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .small-box:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .small-box.bg-info {
+            background: linear-gradient(135deg, #A5D6A7, #66BB6A);
+        }
+
+        .small-box.bg-success {
+            background: linear-gradient(135deg, #81C784, #43A047);
+        }
+
+        .small-box.bg-warning {
+            background: linear-gradient(135deg, #C8E6C9, #66BB6A);
+            color: #2E7D32 !important;
+        }
+
+        .small-box.bg-danger {
+            background: linear-gradient(135deg, #A5D6A7, #2E7D32);
+        }
+
+        /* 📦 Card Styling */
+        .card {
+            border: none !important;
+            border-radius: 15px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+        }
+
+        .card-header {
+            background: #e8f5e9;
+            border-bottom: none;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .card-title {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* 💚 Buttons */
+        .btn-primary {
+            background-color: #66BB6A !important;
+            border-color: #66BB6A !important;
+            border-radius: 25px !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #81C784 !important;
+            border-color: #81C784 !important;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            border-radius: 25px !important;
+            transition: 0.3s;
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.05);
+        }
+
+        /* 🧾 Tables */
+        table.dataTable {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        /* ⚡ Footer link style for small boxes */
+        .small-box-footer {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #fff !important;
+            border-radius: 0 0 15px 15px;
+            transition: background 0.3s ease;
+        }
+
+        .small-box-footer:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* 📱 Responsive Adjustments */
+        @media (max-width: 768px) {
+            .small-box {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
     <!-- Navbar -->
@@ -28,7 +155,6 @@
                 </div>
             </div>
         </div>
-        <!-- /.content-header -->
 
         <!-- Main content -->
         <section class="content">
@@ -36,7 +162,6 @@
                 <!-- ROW of Small Boxes (Stat boxes) -->
                 <div class="row">
                     <div class="col-lg-3 col-6">
-                        <!-- small box -->
                         <div class="small-box bg-info">
                             <div class="inner">
                                 <h3>{{ $students->count() }}</h3>
@@ -45,13 +170,11 @@
                             <div class="icon">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <!-- Example link to show all students or add new -->
                             <a href="#studentList" class="small-box-footer">
                                 View <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- ./col -->
 
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-success">
@@ -62,14 +185,11 @@
                             <div class="icon">
                                 <i class="fas fa-book"></i>
                             </div>
-                            <!-- Example link to manage grading system (subjectId=1 as sample) -->
-                            <a href="{{ route('admin.editGradingSystem', 1) }}"
-                               class="small-box-footer">
+                            <a href="{{ route('admin.editGradingSystem', 1) }}" class="small-box-footer">
                                 Manage Grading <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- ./col -->
 
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-warning">
@@ -80,14 +200,11 @@
                             <div class="icon">
                                 <i class="fas fa-user-clock"></i>
                             </div>
-                            <!-- Example link to add new student -->
-                            <a href="{{ route('admin.createStudent') }}"
-                               class="small-box-footer">
+                            <a href="{{ route('admin.createStudent') }}" class="small-box-footer">
                                 Add Student <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- ./col -->
 
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-danger">
@@ -98,16 +215,12 @@
                             <div class="icon">
                                 <i class="fas fa-chart-bar"></i>
                             </div>
-                            <!-- Example link to teacher syllabus times -->
-                            <a href="{{ route('admin.syllabi.index') }}"
-                               class="small-box-footer">
+                            <a href="{{ route('admin.syllabi.index') }}" class="small-box-footer">
                                 View Syllabi Uploads <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- ./col -->
                 </div>
-                <!-- /.row -->
 
                 <!-- STUDENT LIST -->
                 <div class="row" id="studentList">
@@ -115,7 +228,6 @@
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between">
                                 <h3 class="card-title">Student List</h3>
-                                <!-- "Add Student" button -->
                                 <a href="{{ route('admin.createStudent') }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-user-plus"></i> Add Student
                                 </a>
@@ -143,7 +255,6 @@
                                             <td>{{ $student->course }}</td>
                                             <td>{{ $student->year }}</td>
                                             <td>
-                                                <!-- Remove student -->
                                                 <form action="{{ route('admin.deleteStudent', $student->id) }}"
                                                       method="POST"
                                                       style="display:inline-block"
@@ -159,11 +270,10 @@
                                     @endforeach
                                     </tbody>
                                 </table>
-                            </div><!-- /.card-body -->
-                        </div><!-- /.card -->
-                    </div><!-- /.col -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- /.row -->
 
                 <!-- SUBJECT LIST -->
                 <div class="row mt-4">
@@ -171,16 +281,13 @@
                         <div class="card card-info">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Subject List</h3>
-                                <!-- Add subject button -->
-                                <a href="{{ route('admin.subjects.create') }}"
-                                   class="btn btn-sm btn-primary">
+                                <a href="{{ route('admin.subjects.create') }}" class="btn btn-sm btn-primary">
                                    <i class="fas fa-plus"></i> Add Subject
                                 </a>
                             </div>
                             <div class="card-body">
                                 @if(isset($subjects) && count($subjects) > 0)
-                                    <table id="subjectTable"
-                                           class="table table-bordered table-striped">
+                                    <table id="subjectTable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -198,17 +305,8 @@
                                                 <td>{{ $subj->code ?? 'N/A' }}</td>
                                                 <td>{{ $subj->units ?? 'N/A' }}</td>
                                                 <td>
-                                                    <!-- Link to update grading system -->
-                                                    <a href="{{ route('admin.editGradingSystem', $subj->id) }}"
-                                                       class="btn btn-sm btn-info">
-                                                       Update Grading
-                                                    </a>
-
-                                                    <!-- Edit subject -->
-                                                    <a href="{{ route('admin.subjects.edit', $subj->id) }}"
-                                                       class="btn btn-sm btn-warning">
-                                                       Edit Subject
-                                                    </a>
+                                                    <a href="{{ route('admin.editGradingSystem', $subj->id) }}" class="btn btn-sm btn-info">Update Grading</a>
+                                                    <a href="{{ route('admin.subjects.edit', $subj->id) }}" class="btn btn-sm btn-warning">Edit Subject</a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -217,28 +315,22 @@
                                 @else
                                     <p>No subjects found.</p>
                                 @endif
-                            </div><!-- /.card-body -->
-                        </div><!-- /.card -->
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-        <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
 
     @include('admin.layout.footer')
 </div>
-<!-- ./wrapper -->
 
-<!-- jQuery -->
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-<!-- DataTables & Plugins -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 

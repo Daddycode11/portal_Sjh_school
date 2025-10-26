@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use App\Models\LoginHistory; // ✅ Add this line
 
 class LoginController extends Controller
 {
@@ -32,7 +33,19 @@ class LoginController extends Controller
 
             Log::debug('Login successful for: ' . $user->name . ' (Role: ' . $user->user_role . ')');
 
-            // Redirect based on role
+            /**
+             * ✅ Record the login history
+             */
+            LoginHistory::create([
+                'user_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+                'logged_in_at' => now(),
+            ]);
+
+            /**
+             * ✅ Redirect based on role
+             */
             switch ($user->user_role) {
                 case 'admin':
                     return redirect()->route('admin.dashboard');
@@ -40,7 +53,7 @@ class LoginController extends Controller
                     return redirect()->route('faculty.dashboard');
                 case 'client':
                     return redirect()->route('client.dashboard');
-                case 'principal': // ito yung additional na principal account
+                case 'principal': // Additional principal account
                     return redirect()->route('principal.dashboard');
                 default:
                     Auth::logout();

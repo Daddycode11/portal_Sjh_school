@@ -12,6 +12,13 @@ use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\Principal\TeacherController;
 use App\Http\Controllers\Principal\StudentController;
 use App\Http\Controllers\Client\GradeController;
+use App\Http\Controllers\Admin\LoginHistoryController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\FacultyDashboardController;
+use App\Http\Controllers\Faculty\FacultyHomeController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -196,3 +203,42 @@ Route::prefix('principal')->name('principal.')->group(function () {
 
 Route::get('/client/grades/export-pdf', [ClientController::class, 'exportGradesPDF'])
     ->name('client.grades.exportPDF');
+
+    //log route
+Route::get('/admin/login-history', [LoginHistoryController::class, 'index'])->name('admin.loginHistory');
+;
+//announcement 
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('admin.announcements.index');
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('admin.announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('admin.announcements.store');
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('admin.announcements.destroy');
+});
+
+// Student dashboard route
+Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
+    ->name('student.dashboard');
+
+// Faculty dashboard route
+Route::get('/faculty/dashboard', [FacultyDashboardController::class, 'index'])->name('faculty.dashboard');
+    
+Route::get('/faculty/dashboard', [FacultyHomeController::class, 'index'])
+    ->name('faculty.dashboard');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
+        ->name('student.dashboard'); // <-- This is the key
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/client/dashboard', [StudentDashboardController::class, 'index'])
+        ->name('client.dashboard'); // <-- This defines the route name
+});
+Route::get('/client/dashboard', [StudentDashboardController::class, 'index'])
+    ->name('client.dashboard');
+    
+// Student dashboard (for announcements display)
+Route::middleware(['auth', 'student'])->group(function() {
+    Route::get('/dashboard', [App\Http\Controllers\StudentDashboardController::class, 'index'])
+         ->name('client.dashboard');
+});
