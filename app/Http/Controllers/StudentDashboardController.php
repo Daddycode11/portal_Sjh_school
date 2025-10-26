@@ -1,67 +1,70 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Enrollment;
-use App\Models\Assessment;
-use App\Models\Grade;
 use App\Models\Subject;
+use App\Models\Section;
+use App\Models\Assessment;
+use App\Models\Message;
+use App\Models\Grade;
+use Illuminate\Support\Facades\Auth;
 
 class StudentDashboardController extends Controller
 {
     public function index()
     {
-        $studentId = auth()->id(); // Get current logged-in student ID
+        $studentId = Auth::id(); // Assuming you use default auth
 
-        // Fetch announcements targeted to students or both
-        $announcements = Announcement::whereIn('target_audience', ['students', 'both'])
-            ->orderBy('posted_at', 'desc')
-            ->get();
-
-        // Total subjects student is enrolled in
+        // Total Subjects (unique subjects the student is enrolled in)
         $totalSubjects = Enrollment::where('student_id', $studentId)
             ->distinct('subject_id')
             ->count('subject_id');
 
-        // Total sections student is enrolled in
+        // Total Sections (unique sections the student is enrolled in)
         $totalSections = Enrollment::where('student_id', $studentId)
             ->distinct('section_id')
             ->count('section_id');
 
-        // Unread messages (set 0 for now, or link to messages system)
-        $unreadMessages = 0;
+        // Unread Messages (assuming messages have 'recipient_id' and 'read' column)
+        $unreadMessages = Message::where('recipient_id', $studentId)
+            ->where('read', false)
+            ->count();
 
-        // Upcoming assessments
-        $upcomingAssessments = Assessment::where('schedule_date', '>=', now())
-            ->whereHas('enrollments', function($q) use ($studentId) {
-                $q->where('student_id', $studentId);
+        // Upcoming Assessments (future assessments for the student)
+        $upcomingAssessments = Assessment::whereHas('section.enrollments', function($query) use ($studentId) {
+                $query->where('student_id', $studentId);
             })
+            ->whereDate('schedule_date', '>=', now())
             ->orderBy('schedule_date', 'asc')
             ->get();
 
-        // Enrollments (classes) of the student
-        $enrollments = Enrollment::where('student_id', $studentId)
-            ->with('subject', 'section', 'faculty')
+        // Enrollments with related subject, section, and faculty
+        $enrollments = Enrollment::with(['subject', 'section', 'faculty'])
+            ->where('student_id', $studentId)
             ->get();
 
-        // Recent scores (latest 5)
+        // Recent scores (grades) for this student
         $recentScores = Grade::where('student_id', $studentId)
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
+        // Announcements for students or both audiences
+        $announcements = Announcement::whereIn('target_audience', ['students', 'both'])
+            ->orderBy('posted_at', 'desc')
+            ->get();
+
         return view('client.dashboard', compact(
-            'announcements',
             'totalSubjects',
             'totalSections',
             'unreadMessages',
             'upcomingAssessments',
             'enrollments',
-            'recentScores'
+            'recentScores',
+            'announcements'
         ));
     }
 }
-
