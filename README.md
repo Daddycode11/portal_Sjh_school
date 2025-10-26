@@ -1,67 +1,87 @@
 <p align="center">
-<a href="#"><img src="https://img.shields.io/badge/laravel-v10.x-red.svg" alt="Laravel Version"></a>
-<a href="#"><img src="https://img.shields.io/badge/php-^8.1-blue.svg" alt="PHP Version"></a>
-<a href="#"><img src="https://img.shields.io/badge/mysql-8.0+-orange.svg" alt="MySQL Version"></a>
-<a href="#"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/laravel-v10.x-red.svg" alt="Laravel Version"></a>
+  <a href="#"><img src="https://img.shields.io/badge/php-^8.1-blue.svg" alt="PHP Version"></a>
+  <a href="#"><img src="https://img.shields.io/badge/mysql-8.0+-orange.svg" alt="MySQL Version"></a>
+  <a href="#"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
 </p>
 
-## About Harvard University Academic Portal
+# San Jose National High School Academic Portal
 
-Harvard University Academic Portal is a comprehensive academic management system built with Laravel and MySQL. This project provides a complete solution for managing students, faculty, courses, grades, and academic workflows. Perfect for students learning web development or working on academic projects.
+San Jose National High School Academic Portal is a comprehensive academic management system built with **Laravel** and **MySQL**. It provides a complete solution for managing students, faculty, courses, grades, and academic workflows. Perfect for students learning web development or building educational projects.
 
-The system includes features such as:
+---
 
--   **User Authentication** with role-based access control
--   **Student Management** - enrollment, grades, and academic tracking
--   **Faculty Management** - class assignments, grade entry, and analytics
--   **Course Management** - subjects, sections, and curriculum organization
--   **Assessment Tools** - quizzes, tests, activities, and exams
--   **Grade Analytics** - comprehensive reporting and data visualization
--   **Syllabus Management** - upload and download course materials
--   **Seat Plan Creator** - visual classroom seating arrangements
--   **Report Generation** - PDF and Excel export capabilities
+## Features
+
+- **Role-Based Authentication** for Admin, Faculty, Principal, and Students  
+- **Student Management** – enrollment, grades, and academic tracking  
+- **Faculty Management** – class assignments, grade entry, and analytics  
+- **Course & Subject Management** – subjects, sections, and curriculum organization  
+- **Assessment Tools** – quizzes, tests, activities, and exams  
+- **Grade Analytics** – reporting and data visualization  
+- **Syllabus Management** – upload and download course materials  
+- **Seat Plan Creator** – visual classroom seating arrangements  
+- **Report Generation** – export grades and reports in PDF/Excel  
+
+---
 
 ## User Roles & Permissions
 
-### 👨‍💼 Admin (System Administrator)
+### 👨‍💼 Admin
 
--   Add and remove students and faculty
--   Create and manage subjects and sections
--   Assign faculty to teach specific subjects 
--   Enroll students in classes
--   Set up grading systems for each subject
--   System-wide oversight and management
+- Manage students and faculty accounts  
+- Create and manage subjects and sections  
+- Assign faculty to subjects  
+- Enroll students and manage grading systems  
+- System-wide oversight
 
-### 👨‍🏫 Faculty (Teachers/Professors)
+### 👨‍🏫 Faculty
 
--   View assigned classes and students
--   Upload course syllabi and materials
--   Create assessments (quizzes, tests, activities, exams)
--   Enter and manage student scores
--   Create classroom seat plans
--   View detailed analytics and performance reports
--   Export grade reports to PDF/Excel
+- View assigned classes and students  
+- Upload course syllabi and materials  
+- Create assessments (quizzes, tests, exams)  
+- Enter and manage grades  
+- Create classroom seating plans  
+- View performance analytics  
+- Export grade reports in PDF/Excel
 
-### 👨‍🎓 Students (Clients)
+### 👩‍🎓 Students
 
--   View enrolled classes and subjects
--   Check grades and academic progress
--   Download course syllabi and materials
--   View midterm and final grades
--   Access overall grade calculations
--   See class information and faculty details
+- View enrolled classes and subjects  
+- Check grades and academic progress  
+- Download course materials  
+- Access midterm and final grades  
+- View faculty and class information  
+
+### 👨‍💼 Principal / School Administrator
+
+- Access overall school dashboard  
+- Monitor faculty and student performance  
+- Generate school-wide reports  
+- Manage high-level academic workflows  
+
+---
 
 ## Technology Stack
 
--   **Backend Framework**: Laravel (PHP)
--   **Database**: MySQL
--   **Frontend**: HTML, CSS, JavaScript with TailwindCSS
--   **Icons**: FontAwesome
--   **Charts**: Chart.js for analytics
--   **Export**: PDF and Excel generation
--   **Authentication**: Laravel's built-in authentication system
+- **Backend:** Laravel (PHP 8.1+)  
+- **Database:** MySQL 8.0+  
+- **Frontend:** HTML, CSS, JavaScript, TailwindCSS  
+- **Icons:** FontAwesome  
+- **Charts:** Chart.js for analytics  
+- **Export:** PDF and Excel generation  
+- **Authentication:** Laravel built-in system  
+
+---
 
 ## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/USERNAME/REPOSITORY.git
+cd REPOSITORY
+
 
 Follow these steps to set up the Harvard Academic Portal on your local machine:
 
