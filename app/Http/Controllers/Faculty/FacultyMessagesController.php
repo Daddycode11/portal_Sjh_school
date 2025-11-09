@@ -40,18 +40,18 @@ class FacultyMessagesController extends Controller
         // Get recent conversations
         $conversations = DB::table('messages')
             ->where('sender_id', $user->id)
-            ->orWhere('recipient_id', $user->id)
+            ->orWhere('receiver_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get()
             ->unique(function ($message) use ($user) {
-                return $message->sender_id == $user->id ? $message->recipient_id : $message->sender_id;
+                return $message->sender_id == $user->id ? $message->receiver_id : $message->sender_id;
             })
             ->take(10);
 
         $conversationUsers = collect();
 
         foreach ($conversations as $conversation) {
-            $otherId = $conversation->sender_id == $user->id ? $conversation->recipient_id : $conversation->sender_id;
+            $otherId = $conversation->sender_id == $user->id ? $conversation->receiver_id : $conversation->sender_id;
 
             $otherUser = DB::table('users')
                 ->where('id', $otherId)
@@ -64,15 +64,15 @@ class FacultyMessagesController extends Controller
 
         // Get unread message count
         $unreadCount = DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
             ->count();
 
         // Mark messages as read for initial display
         DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
-            ->update(['read' => true]);
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         return view('faculty.messages.index', compact('students', 'conversationUsers', 'unreadCount'));
     }
@@ -90,7 +90,7 @@ class FacultyMessagesController extends Controller
             ->join('section_student', function ($join) {
                 $join->on('section_subject.section_id', '=', 'section_student.section_id')
                      ->on('section_subject.school_year', '=', 'section_student.school_year')
-                     ->on('section_subject.semester', '=', 'section_subject.semester');
+                     ->on('section_subject.semester', '=', 'section_student.semester');
             })
             ->where('section_student.student_id', $userId)
             ->exists();
@@ -105,11 +105,11 @@ class FacultyMessagesController extends Controller
         $messages = DB::table('messages')
             ->where(function ($query) use ($user, $userId) {
                 $query->where('sender_id', $user->id)
-                      ->where('recipient_id', $userId);
+                      ->where('receiver_id', $userId);
             })
             ->orWhere(function ($query) use ($user, $userId) {
                 $query->where('sender_id', $userId)
-                      ->where('recipient_id', $user->id);
+                      ->where('receiver_id', $user->id);
             })
             ->orderBy('created_at', 'asc')
             ->get();
@@ -140,9 +140,9 @@ class FacultyMessagesController extends Controller
         // Mark messages as read
         DB::table('messages')
             ->where('sender_id', $userId)
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
-            ->update(['read' => true]);
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         return response()->json([
             'messages' => $messages,
@@ -157,8 +157,8 @@ class FacultyMessagesController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'recipient_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:1000'
+            'receiver_id' => 'required|exists:users,id',
+            'content' => 'required|string|max:1000'
         ]);
 
         $user = Auth::user();
@@ -169,8 +169,8 @@ class FacultyMessagesController extends Controller
             ->join('section_student', function ($join) use ($request) {
                 $join->on('section_subject.section_id', '=', 'section_student.section_id')
                      ->on('section_subject.school_year', '=', 'section_student.school_year')
-                     ->on('section_subject.semester', '=', 'section_subject.semester')
-                     ->where('section_student.student_id', '=', $request->recipient_id);
+                     ->on('section_subject.semester', '=', 'section_student.semester')
+                     ->where('section_student.student_id', '=', $request->receiver_id);
             })
             ->exists();
 
@@ -183,9 +183,9 @@ class FacultyMessagesController extends Controller
         // Save the message
         $messageId = DB::table('messages')->insertGetId([
             'sender_id' => $user->id,
-            'recipient_id' => $request->recipient_id,
-            'message' => $request->message,
-            'read' => false,
+            'receiver_id' => $request->receiver_id,
+           
+            'is_read' => false,
             'created_at' => now(),
             'updated_at' => now()
         ]);
@@ -208,8 +208,8 @@ class FacultyMessagesController extends Controller
         $user = Auth::user();
 
         $newMessagesCount = DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
             ->count();
 
         return response()->json([

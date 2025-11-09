@@ -18,11 +18,11 @@ class PrincipalAccountSeeder extends Seeder
                 'name' => 'Principal Account',
                 'student_number' => 'PRINCIPAL001',
                 'major' => 'N/A',
-                'sex' => 'Male', // ✅ change to valid value
+                'sex' => 'M', // ✅ changed to match ENUM ['F','M']
                 'course' => 'N/A',
                 'year' => 'N/A',
                 'user_role' => 'principal',
-                'password' => Hash::make('principal123'), // ✅ bcrypt
+                'password' => Hash::make('principal123'), // ✅ hashed password
             ]);
 
             $this->command->info('✅ Principal account created successfully!');

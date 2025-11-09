@@ -416,152 +416,153 @@ class ClientController extends Controller
         return view('client.grades.index', compact('subjectGrades'));
     }
 
-    /**
-     * View chat interface
-     */
-    public function viewMessages()
-    {
-        $user = Auth::user();
+   /**
+ * View chat interface
+ */
+public function viewMessages()
+{
+    $user = Auth::user();
 
-        // Get all faculty members teaching the student
-        $teachers = DB::table('section_student')
-            ->where('student_id', $user->id)
-            ->join('section_subject', function ($join) {
-                $join->on('section_student.section_id', '=', 'section_subject.section_id')
-                     ->on('section_student.school_year', '=', 'section_subject.school_year')
-                     ->on('section_student.semester', '=', 'section_subject.semester');
-            })
-            ->join('users as faculty', 'section_subject.faculty_id', '=', 'faculty.id')
-            ->join('subjects', 'section_subject.subject_id', '=', 'subjects.id')
-            ->select(
-                'faculty.id as faculty_id',
-                'faculty.name as faculty_name',
-                'subjects.name as subject_name',
-                'subjects.code as subject_code'
-            )
-            ->distinct()
-            ->get();
+    // Get all faculty members teaching the student
+    $teachers = DB::table('section_student')
+        ->where('student_id', $user->id)
+        ->join('section_subject', function ($join) {
+            $join->on('section_student.section_id', '=', 'section_subject.section_id')
+                 ->on('section_student.school_year', '=', 'section_subject.school_year')
+                 ->on('section_student.semester', '=', 'section_subject.semester');
+        })
+        ->join('users as faculty', 'section_subject.faculty_id', '=', 'faculty.id')
+        ->join('subjects', 'section_subject.subject_id', '=', 'subjects.id')
+        ->select(
+            'faculty.id as faculty_id',
+            'faculty.name as faculty_name',
+            'subjects.name as subject_name',
+            'subjects.code as subject_code'
+        )
+        ->distinct()
+        ->get();
 
-        // Get recent conversations
-        $conversations = DB::table('messages')
-            ->where('sender_id', $user->id)
-            ->orWhere('recipient_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->unique(function ($message) use ($user) {
-                return $message->sender_id == $user->id ? $message->recipient_id : $message->sender_id;
-            })
-            ->take(10);
+    // Get recent conversations
+    $conversations = DB::table('messages')
+        ->where('sender_id', $user->id)
+        ->orWhere('receiver_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->unique(function ($message) use ($user) {
+            return $message->sender_id == $user->id ? $message->receiver_id : $message->sender_id;
+        })
+        ->take(10);
 
-        $conversationUsers = collect();
+    $conversationUsers = collect();
 
-        foreach ($conversations as $conversation) {
-            $otherId = $conversation->sender_id == $user->id ? $conversation->recipient_id : $conversation->sender_id;
+    foreach ($conversations as $conversation) {
+        $otherId = $conversation->sender_id == $user->id ? $conversation->receiver_id : $conversation->sender_id;
 
-            $otherUser = DB::table('users')
-                ->where('id', $otherId)
-                ->first();
-
-            if ($otherUser) {
-                $conversationUsers->push($otherUser);
-            }
-        }
-
-        // Mark all messages as read for initial display
-        DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
-            ->update(['read' => true]);
-
-        return view('client.messages.index', compact('teachers', 'conversationUsers'));
-    }
-
-    /**
-     * Get conversation with a specific user
-     */
-    public function getConversation($userId)
-    {
-        $user = Auth::user();
-
-        // Get messages between the two users
-        $messages = DB::table('messages')
-            ->where(function ($query) use ($user, $userId) {
-                $query->where('sender_id', $user->id)
-                      ->where('recipient_id', $userId);
-            })
-            ->orWhere(function ($query) use ($user, $userId) {
-                $query->where('sender_id', $userId)
-                      ->where('recipient_id', $user->id);
-            })
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        // Get user details
         $otherUser = DB::table('users')
-            ->where('id', $userId)
+            ->where('id', $otherId)
             ->first();
 
-        // Mark messages as read
-        DB::table('messages')
-            ->where('sender_id', $userId)
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
-            ->update(['read' => true]);
-
-        return response()->json([
-            'messages' => $messages,
-            'user' => $otherUser
-        ]);
-    }
-
-    /**
-     * Send a message
-     */
-    public function sendMessage(Request $request)
-    {
-        $request->validate([
-            'recipient_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:1000'
-        ]);
-
-        $user = Auth::user();
-
-        // Check if recipient is a faculty member teaching this student
-        $isTeacher = DB::table('section_student')
-            ->where('student_id', $user->id)
-            ->join('section_subject', function ($join) {
-                $join->on('section_student.section_id', '=', 'section_subject.section_id')
-                     ->on('section_student.school_year', '=', 'section_subject.school_year')
-                     ->on('section_student.semester', '=', 'section_subject.semester');
-            })
-            ->where('section_subject.faculty_id', $request->recipient_id)
-            ->exists();
-
-        if (!$isTeacher) {
-            return response()->json([
-                'error' => 'You can only send messages to your teachers'
-            ], 403);
+        if ($otherUser) {
+            $conversationUsers->push($otherUser);
         }
-
-        // Save the message
-        $messageId = DB::table('messages')->insertGetId([
-            'sender_id' => $user->id,
-            'recipient_id' => $request->recipient_id,
-            'message' => $request->message,
-            'read' => false,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        $message = DB::table('messages')
-            ->where('id', $messageId)
-            ->first();
-
-        return response()->json([
-            'message' => $message,
-            'success' => true
-        ]);
     }
+
+    // Mark all messages as read for initial display
+    DB::table('messages')
+        ->where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->update(['is_read' => true]);
+
+    return view('client.messages.index', compact('teachers', 'conversationUsers'));
+}
+
+/**
+ * Get conversation with a specific user
+ */
+public function getConversation($userId)
+{
+    $user = Auth::user();
+
+    // Get messages between the two users
+    $messages = DB::table('messages')
+        ->where(function ($query) use ($user, $userId) {
+            $query->where('sender_id', $user->id)
+                  ->where('receiver_id', $userId);
+        })
+        ->orWhere(function ($query) use ($user, $userId) {
+            $query->where('sender_id', $userId)
+                  ->where('receiver_id', $user->id);
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+
+    // Get user details
+    $otherUser = DB::table('users')
+        ->where('id', $userId)
+        ->first();
+
+    // Mark messages as read
+    DB::table('messages')
+        ->where('sender_id', $userId)
+        ->where('receiver_id', $user->id)
+        ->where('is_read', false)
+        ->update(['is_read' => true]);
+
+    return response()->json([
+        'messages' => $messages,
+        'user' => $otherUser
+    ]);
+}
+
+/**
+ * Send a message
+ */
+public function sendMessage(Request $request)
+{
+    $request->validate([
+        'receiver_id' => 'required|exists:users,id',
+        'message' => 'required|string|max:1000'
+    ]);
+
+    $user = Auth::user();
+
+    // Check if recipient is a faculty member teaching this student
+    $isTeacher = DB::table('section_student')
+        ->where('student_id', $user->id)
+        ->join('section_subject', function ($join) {
+            $join->on('section_student.section_id', '=', 'section_subject.section_id')
+                 ->on('section_student.school_year', '=', 'section_subject.school_year')
+                 ->on('section_student.semester', '=', 'section_subject.semester');
+        })
+        ->where('section_subject.faculty_id', $request->receiver_id)
+        ->exists();
+
+    if (!$isTeacher) {
+        return response()->json([
+            'error' => 'You can only send messages to your teachers'
+        ], 403);
+    }
+
+    // Save the message
+    $messageId = DB::table('messages')->insertGetId([
+        'sender_id' => $user->id,
+        'receiver_id' => $request->receiver_id,
+        'content' => $request->message,
+        'is_read' => false,
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+
+    $message = DB::table('messages')
+        ->where('id', $messageId)
+        ->first();
+
+    return response()->json([
+        'message' => $message,
+        'success' => true
+    ]);
+}
+
 
     /**
      * Download a syllabus file

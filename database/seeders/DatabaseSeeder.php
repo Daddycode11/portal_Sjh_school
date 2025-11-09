@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
    public function run(): void
 {
-    // Other seeders...
+    // Other seeders... 
     $this->call(PrincipalAccountSeeder::class);
 }
 }
