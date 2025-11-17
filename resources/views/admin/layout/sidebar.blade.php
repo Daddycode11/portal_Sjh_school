@@ -16,8 +16,7 @@
         <!-- User Panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center border-bottom" style="border-color: rgba(255,255,255,0.15) !important;">
             <div class="image">
-                <div class="img-circle bg-light d-flex align-items-center justify-content-center"
-                    style="width: 38px; height: 38px;">
+                <div class="img-circle bg-light d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
                     <span class="text-success font-weight-bold">{{ $initials }}</span>
                 </div>
             </div>
@@ -30,8 +29,7 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
                 <!-- Dashboard -->
                 <li class="nav-item">
@@ -62,41 +60,108 @@
                         <p>Faculty Assignments</p>
                     </a>
                 </li>
-                <!-- Announcements -->
-<!-- Announcements -->
+<!-- 🎓 View Grades -->
+<li class="nav-item">
+    <a href="{{ route('admin.grades.index') }}"
+       class="nav-link {{ request()->routeIs('admin.grades.index') ? 'active' : '' }}"
+       style="{{ request()->routeIs('admin.grades.index') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+       <i class="nav-icon fas fa-graduation-cap"></i>
+       <p>View Grades</p>
+    </a>
+</li>
+<!-- 📄 View Reports -->
+<li class="nav-item">
+    <a href="{{ route('admin.reports.index') }}"
+       class="nav-link {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}"
+       style="{{ request()->routeIs('admin.reports.index') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+       <i class="nav-icon fas fa-file-alt text-white"></i>
+       <p>View Reports</p>
+    </a>
+</li>
+  <!-- Enrollment Requests -->
+<!--               <li class="nav-item">
+    <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('admin.enrollments.requests') ? 'active' : '' }}" 
+       href="{{ route('admin.enrollments.requests') }}">
+        Enrollment Requests
+        @if($pendingEnrollmentCount > 0)
+            <span class="badge bg-danger ms-2">{{ $pendingEnrollmentCount }}</span>
+        @endif
+    </a>
+</li> -->
+
+
+                <!-- All Enrollments -->
+           <!--      <li class="nav-item">
+                    <a href="{{ route('admin.enrollments.index') }}"
+                       class="nav-link {{ request()->routeIs('admin.enrollments.index') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>All Enrollments</p>
+                    </a>
+                </li>
+ -->
+<!--  🧾 Enrollment Requests -->
+<!-- <li class="nav-item">
+    <a href="{{ route('admin.enrollments.requests') }}"
+       class="nav-link {{ request()->routeIs('admin.enrollments.*') ? 'active' : '' }}">
+       <i class="fas fa-file-alt"></i>
+       <p>Enrollment Requests</p>
+    </a>
+</li> -->
+
+<!-- 📊 System Overview -->
+<li class="nav-item">
+    <a href="{{ route('admin.activities.index') }}"
+       class="nav-link {{ request()->routeIs('admin.activities.index') ? 'active' : '' }}"
+       style="{{ request()->routeIs('admin.activities.index') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+       <i class="nav-icon fas fa-chart-line text-white"></i>
+       <p>System Overview</p>
+    </a>
+</li>
+
+
+<!-- 📢 Manage Announcements -->
 <li class="nav-item">
     <a href="{{ route('admin.announcements.index') }}"
-        class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}"
-        style="{{ request()->routeIs('admin.announcements.*') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
-        <i class="nav-icon fas fa-bullhorn text-white"></i>
-        <p>Announcements</p>
-    </a>
-</li>
-                <!-- Login History -->
-<li class="nav-item">
-    <a href="{{ route('admin.loginHistory') }}"
-        class="nav-link {{ request()->routeIs('admin.loginHistory') ? 'active' : '' }}"
-        style="{{ request()->routeIs('admin.loginHistory') ? 'background-color: #66BB6A; color: #000;' : 'color: #fff;' }}">
-        <i class="nav-icon fas fa-history text-white"></i>
-        <p>Login History</p>
+       class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}"
+       style="{{ request()->routeIs('admin.announcements.*') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+       <i class="nav-icon fas fa-bullhorn text-white"></i>
+       <p>Manage Announcements</p>
     </a>
 </li>
 
+                <!-- 📢 Manage Announcements -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.announcements.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}"
+                        style="{{ request()->routeIs('admin.announcements.*') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+                        <i class="nav-icon fas fa-bullhorn text-white"></i>
+                        <p>Announcements</p>
+                    </a>
+                </li>
 
+                <!-- 🕒 Login History -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.loginHistory') }}"
+                        class="nav-link {{ request()->routeIs('admin.loginHistory') ? 'active' : '' }}"
+                        style="{{ request()->routeIs('admin.loginHistory') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+                        <i class="nav-icon fas fa-history text-white"></i>
+                        <p>Login History</p>
+                    </a>
+                </li>
 
-                <!-- Logout -->
+                <!-- 🚪 Logout -->
                 <li class="nav-item mt-4">
                     <a href="{{ route('logout') }}" class="nav-link" style="background-color: #c62828; color: #fff;">
                         <i class="nav-icon fas fa-sign-out-alt text-white"></i>
                         <p>Logout</p>
                     </a>
                 </li>
-
             </ul>
         </nav>
     </div>
     <!-- /.sidebar -->
 </aside>
+
 
 <!-- Sidebar Hover / Active Styles -->
 <style>
@@ -114,3 +179,23 @@
         text-decoration: none;
     }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+@if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: "Success",
+        text: "{{ session('success') }}",
+        timer: 2000,
+        showConfirmButton: false,
+    });
+@endif
+
+@if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: "Error",
+        text: "{{ session('error') }}",
+    });
+@endif
+</script>

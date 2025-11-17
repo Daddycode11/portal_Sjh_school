@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Enrollment;
-use App\Models\Subject;
-use App\Models\Section;
 use App\Models\Assessment;
 use App\Models\Message;
 use App\Models\Grade;
@@ -16,7 +14,7 @@ class StudentDashboardController extends Controller
 {
     public function index()
     {
-        $studentId = Auth::id(); // Assuming you use default auth
+        $studentId = Auth::id(); // Default auth
 
         // Total Subjects (unique subjects the student is enrolled in)
         $totalSubjects = Enrollment::where('student_id', $studentId)
@@ -39,32 +37,33 @@ class StudentDashboardController extends Controller
             })
             ->whereDate('schedule_date', '>=', now())
             ->orderBy('schedule_date', 'asc')
-            ->get();
+            ->get() ?? collect(); // Ensure it's always a collection
 
         // Enrollments with related subject, section, and faculty
         $enrollments = Enrollment::with(['subject', 'section', 'faculty'])
             ->where('student_id', $studentId)
-            ->get();
+            ->get() ?? collect();
 
         // Recent scores (grades) for this student
         $recentScores = Grade::where('student_id', $studentId)
             ->orderBy('created_at', 'desc')
             ->take(5)
-            ->get();
+            ->get() ?? collect();
 
         // Announcements for students or both audiences
         $announcements = Announcement::whereIn('target_audience', ['students', 'both'])
             ->orderBy('posted_at', 'desc')
-            ->get();
+            ->get() ?? collect();
 
-        return view('client.dashboard', compact(
-            'totalSubjects',
-            'totalSections',
-            'unreadMessages',
-            'upcomingAssessments',
-            'enrollments',
-            'recentScores',
-            'announcements'
-        ));
+        // Return view with all variables
+        return view('client.dashboard', [
+            'totalSubjects' => $totalSubjects ?? 0,
+            'totalSections' => $totalSections ?? 0,
+            'unreadMessages' => $unreadMessages ?? 0,
+            'upcomingAssessments' => $upcomingAssessments,
+            'enrollments' => $enrollments,
+            'recentScores' => $recentScores,
+            'announcements' => $announcements,
+        ]);
     }
 }

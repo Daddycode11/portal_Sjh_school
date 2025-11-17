@@ -106,6 +106,12 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+<!-- <li class="nav-item {{ request()->routeIs('client.enrollment.*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ route('client.enrollment.form') }}">
+        <i class="fas fa-file-alt"></i>
+        <span>Enrollment Application</span>
+    </a>
+</li> -->
 
             <hr class="sidebar-divider">
 

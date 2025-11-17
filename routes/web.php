@@ -15,9 +15,19 @@ use App\Http\Controllers\Client\GradeController;
 use App\Http\Controllers\Admin\LoginHistoryController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StudentDashboardController;
-use App\Http\Controllers\FacultyDashboardController;
+use App\Http\Controllers\Faculty\FacultyDashboardController;
 use App\Http\Controllers\Faculty\FacultyHomeController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Admin\AdminGradeController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ActivityController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\StudentEnrollmentController;
+use App\Http\Controllers\Admin\AdminEnrollmentController;  
+use App\Http\Middleware\ClientMiddleware;
+use App\Http\Controllers\AdminDashboardController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -90,17 +100,11 @@ Route::prefix('admin')->middleware(['auth','admin'])->name('admin.')->group(func
     // Login History
     Route::get('/login-history', [LoginHistoryController::class, 'index'])->name('loginHistory');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Faculty Routes
-|--------------------------------------------------------------------------
-*/
 Route::prefix('faculty')->middleware(['auth','faculty'])->name('faculty.')->group(function() {
 
     // Dashboard
-    Route::get('/dashboard', [FacultyDashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('/dashboard', [FacultyDashboardController::class, 'index'])
+        ->name('dashboard');
     // Class Management
     Route::get('/classes', [FacultyController::class, 'myClasses'])->name('classes.index');
     Route::get('/classes/{sectionId}/{subjectId}/{schoolYear}/{semester}', [FacultyController::class, 'classDetails'])->name('classes.details');
@@ -185,3 +189,125 @@ Route::prefix('principal')->middleware(['auth','principal'])->name('principal.')
     Route::get('/reports', [PrincipalController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [PrincipalController::class, 'settings'])->name('settings');
 });
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+      // Students
+    Route::get('/students/create', [AdminController::class, 'createStudent'])->name('createStudent');
+    Route::post('/students', [AdminController::class, 'storeStudent'])->name('storeStudent');
+    Route::delete('/students/{id}', [AdminController::class, 'deleteStudent'])->name('deleteStudent');
+
+
+    // ✅ View Grades Page
+    Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('viewReports');
+
+    // Validate Enrollment
+Route::get('/enrollments/validate', [EnrollmentController::class, 'validateEnrollment'])->name('validateEnrollment'); 
+
+    // Monitor Activities
+    Route::get('/activities', [ActivityController::class, 'index'])->name('monitorActivities');
+
+    // Manage Users
+    Route::resource('users', UserController::class);
+
+    // Announcements
+    Route::resource('announcements', AnnouncementController::class);
+
+    // Login History
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login-history', [AdminController::class, 'loginHistory'])->name('loginHistory');
+});
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/grades', [AdminGradeController::class, 'index'])->name('grades.index');
+});
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+});
+///Activity Controller
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+});
+
+// -------------------------
+// Admin Faculty Management
+// -------------------------
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
+    Route::get('faculty', [FacultyController::class, 'index'])->name('faculty.index');
+    Route::get('faculty/create', [FacultyController::class, 'create'])->name('faculty.create');
+    Route::post('faculty', [FacultyController::class, 'store'])->name('faculty.store');
+    Route::get('faculty/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculty.edit');
+    Route::put('faculty/{faculty}', [FacultyController::class, 'update'])->name('faculty.update');
+    Route::delete('faculty/{faculty}', [FacultyController::class, 'destroy'])->name('faculty.destroy');
+});
+
+// -------------------------
+// Faculty Dashboard
+// -------------------------
+// Route::prefix('faculty')
+//     ->middleware(['auth', 'isFaculty'])
+//     // ->name('faculty.')
+//     ->group(function () {
+//         Route::get('dashboard', [FacultyDashboardController::class, 'index'])->name('dashboard');
+//     });
+
+// Route::prefix('faculty')
+//     ->middleware(['auth','isFaculty'])
+//     ->group(function() {
+//         Route::get('dashboard', [FacultyDashboardController::class, 'index'])->name('dashboard');
+// });
+
+
+Route::prefix('faculty')->middleware(['auth'])->name('faculty.')->group(function() {
+    Route::get('dashboard', [FacultyDashboardController::class, 'index'])->name('dashboard');
+});
+// Admin dashboard & enrollments
+Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () {
+
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    // All enrollments list
+    Route::get('enrollments', [AdminEnrollmentController::class, 'index'])
+        ->name('enrollments.index');
+
+    // Pending enrollment requests
+    Route::get('enrollments-requests', [AdminEnrollmentController::class, 'requests'])
+        ->name('enrollments.requests');
+
+    // Approve / Reject
+    Route::post('enrollments/{id}/approve', [AdminEnrollmentController::class, 'approve'])
+        ->name('enrollments.approve');
+
+    Route::post('enrollments/{id}/reject', [AdminEnrollmentController::class, 'reject'])
+        ->name('enrollments.reject');
+});
+
+// Student dashboard and enrollment
+Route::middleware(['auth'])->group(function () {
+
+    // Dashboard route MUST use controller to pass variables
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
+        ->name('client.dashboard');
+
+    // Student Enrollment submission
+    Route::post('/student/enrollment', [StudentEnrollmentController::class, 'submit'])
+        ->name('student.enrollment.submit');
+});
+
+//test route
+Route::middleware(['auth'])->group(function () {
+    Route::get('/student/enrollment', [StudentEnrollmentController::class, 'form'])
+        ->name('client.enrollment.form'); // this fixes the error
+
+    Route::post('/student/enrollment', [StudentEnrollmentController::class, 'submit'])
+        ->name('student.enrollment.submit');
+});
+// Student Enrollment Form (full page)
+Route::get('/student/enrollment', function () {
+    return view('client.enrollment_form');
+})->middleware('auth')->name('client.enrollment.form');

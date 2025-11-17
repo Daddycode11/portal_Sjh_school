@@ -20,4 +20,9 @@ class GradingSystem extends Model
         'school_year',
         'semester',
     ];
+      public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+    
 }

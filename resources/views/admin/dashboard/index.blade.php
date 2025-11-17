@@ -141,86 +141,96 @@
     </nav>
     <!-- /.navbar -->
 
-    @include('admin.layout.sidebar')
+   @include('admin.layout.sidebar')
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Content Header -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Admin Dashboard</h1>
-                    </div>
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Admin Dashboard</h1>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <!-- ROW of Small Boxes (Stat boxes) -->
-                <div class="row">
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>{{ $students->count() }}</h3>
-                                <p>Total Students</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <a href="#studentList" class="small-box-footer">
-                                View <i class="fas fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
 
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
-                            <div class="inner">
-                                <h3>{{ $subjects->count() }}</h3>
-                                <p>Active Subjects</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            <a href="{{ route('admin.editGradingSystem', 1) }}" class="small-box-footer">
-                                Manage Grading <i class="fas fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
+            <!-- STAT BOXES -->
+            <div class="row">
 
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
-                            <div class="inner">
-                                <h3>5</h3>
-                                <p>Pending Registrations</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-user-clock"></i>
-                            </div>
-                            <a href="{{ route('admin.createStudent') }}" class="small-box-footer">
-                                Add Student <i class="fas fa-arrow-circle-right"></i>
-                            </a>
+                <!-- Total Enrollments -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>{{ $totalEnrollments }}</h3>
+                            <p>Total Enrollments</p>
                         </div>
-                    </div>
-
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-danger">
-                            <div class="inner">
-                                <h3>12</h3>
-                                <p>Reports Generated</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <a href="{{ route('admin.syllabi.index') }}" class="small-box-footer">
-                                View Syllabi Uploads <i class="fas fa-arrow-circle-right"></i>
-                            </a>
+                        <div class="icon">
+                            <i class="fas fa-users"></i>
                         </div>
+                        <a href="{{ route('admin.enrollments.index') }}" class="small-box-footer">
+                            View All <i class="fas fa-arrow-circle-right"></i>
+                        </a>
                     </div>
                 </div>
+
+                <!-- Approved Enrollments -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{ $approved }}</h3>
+                            <p>Approved Enrollments</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <a href="{{ route('admin.enrollments.index') }}" class="small-box-footer">
+                            View Approved <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pending Enrollment Requests -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>{{ $pending }}</h3>
+                            <p>Pending Enrollment Requests</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <a href="{{ route('admin.enrollments.requests') }}" class="small-box-footer">
+                            View Requests <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Rejected Enrollments -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3>{{ $rejected }}</h3>
+                            <p>Rejected Enrollments</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <a href="{{ route('admin.enrollments.index') }}" class="small-box-footer">
+                            View Rejected <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END ROW -->
+
 
                 <!-- STUDENT LIST -->
                 <div class="row" id="studentList">
@@ -240,7 +250,7 @@
                                             <th>Student Number</th>
                                             <th>Major</th>
                                             <th>Sex</th>
-                                            <th>Course</th>
+                                    <!--         <th>Course</th> -->
                                             <th>Year</th>
                                             <th>Action</th>
                                         </tr>
@@ -252,7 +262,7 @@
                                             <td>{{ $student->student_number }}</td>
                                             <td>{{ $student->major }}</td>
                                             <td>{{ $student->sex }}</td>
-                                            <td>{{ $student->course }}</td>
+                                          <!--   <td>{{ $student->course }}</td> -->
                                             <td>{{ $student->year }}</td>
                                             <td>
                                                 <form action="{{ route('admin.deleteStudent', $student->id) }}"
@@ -320,9 +330,90 @@
                     </div>
                 </div>
 
+  
+   <!-- STUDENT ENROLLMENTS TABLE -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">📄 Student Enrollments</h3>
+                <div>
+                    <a href="{{ route('admin.enrollments.index') }}" class="btn btn-primary">
+                        All Enrollments
+                    </a>
+                    <a href="{{ route('admin.enrollments.requests') }}" class="btn btn-warning">
+                        Pending Enrollments
+                        <span class="badge bg-light text-dark">{{ $pending ?? 0 }}</span>
+                    </a>
+                </div>
             </div>
-        </section>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Grade Level</th>
+                            <th>Strand</th>
+                            <th>Section</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($enrollments as $enrollment)
+                            @php
+                                $statusClass = match($enrollment->status ?? '') {
+                                    'Pending' => 'bg-warning text-dark',
+                                    'Approved' => 'bg-success',
+                                    'Rejected' => 'bg-danger',
+                                    default => 'bg-secondary'
+                                };
+                            @endphp
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $enrollment->student_name ?? '-' }}</td>
+                                <td>{{ $enrollment->grade_level ?? '-' }}</td>
+                                <td>{{ $enrollment->strand ?? '-' }}</td>
+                                <td>{{ $enrollment->section ?? '-' }}</td>
+                                <td>{{ $enrollment->contact_number ?? '-' }}</td>
+                                <td>{{ $enrollment->email ?? '-' }}</td>
+                                <td>
+                                    <span class="badge {{ $statusClass }}">{{ $enrollment->status ?? 'N/A' }}</span>
+                                </td>
+                                <td>
+                                    @if(($enrollment->status ?? '') === 'Pending')
+                                        <form action="{{ route('admin.enrollments.approve', $enrollment->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-success" onclick="return confirm('Approve this enrollment?')">Approve</button>
+                                        </form>
+                                        <form action="{{ route('admin.enrollments.reject', $enrollment->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Reject this enrollment?')">Reject</button>
+                                        </form>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center">No enrollments found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+</div>
+
 
     @include('admin.layout.footer')
 </div>

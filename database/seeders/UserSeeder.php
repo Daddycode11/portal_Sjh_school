@@ -10,44 +10,46 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = [
+        // ✅ Admin user
+        User::updateOrCreate(
+            ['student_number' => 'administrator'],
             [
                 'name' => 'Admin',
-                'student_number' => 'administrator',
                 'major' => 'admin',
                 'sex' => 'F',
                 'course' => 'admin',
                 'year' => 'admin',
-                'password' => Hash::make('Admin@123'), // ✅ stronger password
+                'password' => Hash::make('Admin@123'),
                 'user_role' => 'admin',
-            ],
-            [
-                'name' => 'Santos, Juan Miguel',
-                'student_number' => '15-SC-2264',
-                'major' => 'SC_BSIT',
-                'sex' => 'M',
-                'course' => 'CHMBAC',
-                'year' => 'THIRD YEAR',
-                'password' => Hash::make('Client@123'),
-                'user_role' => 'client',
-            ],
-            [
-                'name' => 'Reyes, Maria Clara Dela Cruz',
-                'student_number' => '15-SC-2121',
-                'major' => 'SC_BSIT',
-                'sex' => 'F',
-                'course' => 'CHMBAC',
-                'year' => 'THIRD YEAR',
-                'password' => Hash::make('Client@123'),
-                'user_role' => 'client',
-            ],
-            // 👉 Repeat for the rest of your clients with Hash::make('Client@123')
+            ]
+        );
+
+        // ✅ Sample clients
+        $clients = [
+            ['name' => 'Santos, Juan Miguel', 'student_number' => '15-SC-2264', 'sex' => 'M'],
+            ['name' => 'Reyes, Maria Clara Dela Cruz', 'student_number' => '15-SC-2121', 'sex' => 'F'],
+            ['name' => 'Garcia, Luis Antonio', 'student_number' => '15-SC-2145', 'sex' => 'M'],
+            ['name' => 'Lopez, Ana Teresa', 'student_number' => '15-SC-2198', 'sex' => 'F'],
+            ['name' => 'Cruz, Miguel Angelo', 'student_number' => '15-SC-2230', 'sex' => 'M'],
+            ['name' => 'Torres, Kristine Joy', 'student_number' => '15-SC-2177', 'sex' => 'F'],
+            ['name' => 'Dela Rosa, Mark Anthony', 'student_number' => '15-SC-2255', 'sex' => 'M'],
+            ['name' => 'Flores, Janine Marie', 'student_number' => '15-SC-2180', 'sex' => 'F'],
+            ['name' => 'Valdez, Rafael', 'student_number' => '15-SC-2201', 'sex' => 'M'],
+            ['name' => 'Santos, Katrina Mae', 'student_number' => '15-SC-2210', 'sex' => 'F'],
         ];
 
-        foreach ($users as $userData) {
+        foreach ($clients as $client) {
             User::updateOrCreate(
-                ['student_number' => $userData['student_number']], // avoids duplicates
-                $userData
+                ['student_number' => $client['student_number']],
+                [
+                    'name' => $client['name'],
+                    'major' => 'SC_BSIT',
+                    'course' => 'CHMBAC',
+                    'year' => 'THIRD YEAR',
+                    'sex' => $client['sex'],
+                    'password' => Hash::make('Client@123'),
+                    'user_role' => 'client',
+                ]
             );
         }
     }

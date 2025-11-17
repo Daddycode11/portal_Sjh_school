@@ -4,12 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Section;
+use App\Models\Subject;
+use App\Models\User;
+use App\Models\StudentScore;
 
 class Assessment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'section_id',
         'subject_id',
         'faculty_id',
         'title',
@@ -26,6 +31,12 @@ class Assessment extends Model
         'schedule_date' => 'date',
         'schedule_time' => 'datetime',
     ];
+
+    // ✅ Add this:
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
 
     public function subject()
     {

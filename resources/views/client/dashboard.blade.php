@@ -4,27 +4,28 @@
 
 @section('styles')
 <style>
-    /* ===== Dashboard Green Theme ===== */
     body {
         font-family: 'Poppins', 'Roboto', sans-serif;
-        background-color: #f5fff5; /* very light mint background */
+        background-color: #f5fff5;
     }
 
     /* Dashboard Cards */
     .dashboard-card {
-        background-color: #4CAF50; /* primary green */
+        background-color: #4CAF50;
         color: #fff;
-        border: none;
         border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
     }
 
     .dashboard-card:hover {
-        transform: translateY(-5px);
-        background-color: #43A047; /* slightly darker green on hover */
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
     }
 
     .dashboard-card h6 {
@@ -42,20 +43,18 @@
 
     .dashboard-icon {
         opacity: 0.9;
-        color: #ffffff;
+        font-size: 2rem;
     }
 
-    /* Accent Button */
-    .btn-accent {
-        background-color: #4CAF50;
-        color: #fff;
-        border-radius: 30px;
-        transition: all 0.3s ease;
+    .badge-unread {
+        font-size: 0.7rem;
+        vertical-align: top;
+        margin-left: 5px;
     }
 
-    .btn-accent:hover {
-        background-color: #43A047;
-        color: #fff;
+    /* Table Hover Effects */
+    .table-hover tbody tr:hover {
+        background-color: #e8f5e9;
     }
 
     /* Card Headers */
@@ -67,10 +66,22 @@
         border-top-right-radius: 12px !important;
     }
 
-    /* Table Hover Effect */
-    .table-hover tbody tr:hover {
-        background-color: #e8f5e9;
+    /* Accent Button */
+    .btn-accent {
+        background-color: #4CAF50;
+        color: #fff;
+        border-radius: 30px;
+        transition: all 0.3s ease;
     }
+    .btn-accent:hover {
+        background-color: #43A047;
+        color: #fff;
+    }
+
+    /* Assessment Color Coding */
+    .assessment-today { background-color: #d4edda !important; } /* green */
+    .assessment-week { background-color: #fff3cd !important; } /* yellow */
+    .assessment-later { background-color: #e2e3e5 !important; } /* gray */
 </style>
 @endsection
 
@@ -78,72 +89,146 @@
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
+    <!-- Enroll Now Button -->
+    <div class="text-end mb-3">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#enrollModal">
+            📝 Enroll Now
+        </button>
+    </div>
+
+    <!-- ENROLLMENT MODAL -->
+    <div class="modal fade @if($errors->any() || session('success')) show @endif" 
+         id="enrollModal" tabindex="-1" 
+         aria-labelledby="enrollModalLabel" 
+         aria-hidden="{{ $errors->any() || session('success') ? 'false' : 'true' }}" 
+         style="{{ $errors->any() || session('success') ? 'display:block;' : '' }}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📝 Enroll in Senior High School</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Success Message -->
+                    @if(session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                        <script>
+                            setTimeout(function(){
+                                window.location.href = "{{ route('client.dashboard') }}";
+                            }, 2000);
+                        </script>
+                    @endif
+
+                   <form action="{{ route('student.enrollment.submit') }}" method="POST">
+    @csrf
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="student_name" class="form-control" 
+               value="{{ old('student_name', auth()->user()->name ?? '') }}" required>
+        @error('student_name')<small class="text-danger">{{ $message }}</small>@enderror
+    </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Grade Level</label>
+                            <select name="grade_level" class="form-select" required>
+                                <option value="Grade 11" {{ old('grade_level')=='Grade 11' ? 'selected' : '' }}>Grade 11</option>
+                                <option value="Grade 12" {{ old('grade_level')=='Grade 12' ? 'selected' : '' }}>Grade 12</option>
+                            </select>
+                            @error('grade_level')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Strand</label>
+                            <select name="strand" class="form-select" required>
+                                @foreach(['STEM','ABM','HUMSS','GAS','TVL'] as $strand)
+                                    <option value="{{ $strand }}" {{ old('strand')==$strand ? 'selected' : '' }}>{{ $strand }}</option>
+                                @endforeach
+                            </select>
+                            @error('strand')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Section (optional)</label>
+                            <input type="text" name="section" class="form-control" value="{{ old('section') }}">
+                            @error('section')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contact Number</label>
+                            <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number') }}" required>
+                            @error('contact_number')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', auth()->user()->email ?? '') }}" required>
+                            @error('email')<small class="text-danger">{{ $message }}</small>@enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Submit Enrollment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Dashboard Cards -->
-    <div class="row">
-        <!-- Total Subjects -->
+    <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card dashboard-card d-flex align-items-center justify-content-between px-3 py-3">
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6>Total Subjects</h6>
-                        <h4>{{ $totalSubjects }}</h4>
-                    </div>
-                    <i class="fas fa-book fa-2x dashboard-icon"></i>
+            <div class="dashboard-card">
+                <div>
+                    <h6>Total Subjects</h6>
+                    <h4 class="count-num">{{ $totalSubjects ?? 0 }}</h4>
                 </div>
+                <i class="fas fa-book dashboard-icon"></i>
             </div>
         </div>
 
-        <!-- Total Sections -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card dashboard-card d-flex align-items-center justify-content-between px-3 py-3">
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6>Total Sections</h6>
-                        <h4>{{ $totalSections }}</h4>
-                    </div>
-                    <i class="fas fa-users fa-2x dashboard-icon"></i>
+            <div class="dashboard-card">
+                <div>
+                    <h6>Total Sections</h6>
+                    <h4 class="count-num">{{ $totalSections ?? 0 }}</h4>
                 </div>
+                <i class="fas fa-users dashboard-icon"></i>
             </div>
         </div>
 
-        <!-- Unread Messages -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card dashboard-card d-flex align-items-center justify-content-between px-3 py-3">
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6>Unread Messages</h6>
-                        <h4>{{ $unreadMessages }}</h4>
-                    </div>
-                    <i class="fas fa-envelope fa-2x dashboard-icon"></i>
+            <div class="dashboard-card">
+                <div>
+                    <h6>Unread Messages
+                        @if(($unreadMessages ?? 0) > 0)
+                            <span class="badge bg-danger badge-unread">{{ $unreadMessages }}</span>
+                        @endif
+                    </h6>
+                    <h4 class="count-num">{{ $unreadMessages ?? 0 }}</h4>
                 </div>
+                <i class="fas fa-envelope dashboard-icon"></i>
             </div>
         </div>
 
-        <!-- Upcoming Assessments -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card dashboard-card d-flex align-items-center justify-content-between px-3 py-3">
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6>Upcoming Assessments</h6>
-                        <h4>{{ $upcomingAssessments->count() }}</h4>
-                    </div>
-                    <i class="fas fa-calendar fa-2x dashboard-icon"></i>
+            <div class="dashboard-card">
+                <div>
+                    <h6>Upcoming Assessments</h6>
+                    <h4 class="count-num">{{ $upcomingAssessments->count() ?? 0 }}</h4>
                 </div>
+                <i class="fas fa-calendar dashboard-icon"></i>
             </div>
         </div>
     </div>
 
     <!-- Enrolled Classes & Upcoming Assessments -->
     <div class="row">
+        <!-- Classes -->
         <div class="col-lg-6 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0">My Classes</h6>
-                </div>
+            <div class="card shadow">
+                <div class="card-header"><h6 class="m-0">My Classes</h6></div>
                 <div class="card-body">
-                    @if($enrollments->isEmpty())
-                        <p class="text-center">You are not enrolled in any classes.</p>
-                    @else
+                    @if(isset($enrollments) && $enrollments->isNotEmpty())
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead>
@@ -157,18 +242,16 @@
                                 <tbody>
                                     @foreach($enrollments->take(5) as $enrollment)
                                     <tr>
-                                        <td>{{ $enrollment->subject_code }} - {{ $enrollment->subject_name }}</td>
-                                        <td>{{ $enrollment->section_name }}</td>
-                                        <td>{{ $enrollment->faculty_name }}</td>
+                                        <td>{{ $enrollment->subject?->code ?? '-' }} - {{ $enrollment->subject?->name ?? '-' }}</td>
+                                        <td>{{ $enrollment->section?->name ?? '-' }}</td>
+                                        <td>{{ $enrollment->faculty?->name ?? '-' }}</td>
                                         <td>
                                             <a href="{{ route('client.classes.details', [
-                                                'sectionId' => $enrollment->section_id,
-                                                'subjectId' => $enrollment->subject_id,
-                                                'schoolYear' => $enrollment->school_year,
-                                                'semester' => $enrollment->semester
-                                            ]) }}" class="btn btn-sm btn-accent">
-                                                <i class="fas fa-eye"></i> View
-                                            </a>
+                                                'sectionId' => $enrollment->section_id ?? 0,
+                                                'subjectId' => $enrollment->subject_id ?? 0,
+                                                'schoolYear' => $enrollment->school_year ?? '',
+                                                'semester' => $enrollment->semester ?? ''
+                                            ]) }}" class="btn btn-sm btn-accent"><i class="fas fa-eye"></i> View</a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -176,25 +259,23 @@
                             </table>
                         </div>
                         @if($enrollments->count() > 5)
-                        <div class="text-center mt-3">
-                            <a href="{{ route('client.classes.index') }}" class="btn btn-link">View All Classes</a>
-                        </div>
+                            <div class="text-center mt-3">
+                                <a href="{{ route('client.classes.index') }}" class="btn btn-link">View All Classes</a>
+                            </div>
                         @endif
+                    @else
+                        <p class="text-center">You are not enrolled in any classes.</p>
                     @endif
                 </div>
             </div>
         </div>
 
-        <!-- Upcoming Assessments Table -->
+        <!-- Upcoming Assessments -->
         <div class="col-lg-6 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0">Upcoming Assessments</h6>
-                </div>
+            <div class="card shadow">
+                <div class="card-header"><h6 class="m-0">Upcoming Assessments</h6></div>
                 <div class="card-body">
-                    @if($upcomingAssessments->isEmpty())
-                        <p class="text-center">No upcoming assessments scheduled.</p>
-                    @else
+                    @if(isset($upcomingAssessments) && $upcomingAssessments->isNotEmpty())
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead>
@@ -207,73 +288,60 @@
                                 </thead>
                                 <tbody>
                                     @foreach($upcomingAssessments->take(5) as $assessment)
-                                    <tr>
-                                        <td>{{ $assessment->subject_code }}</td>
-                                        <td>{{ $assessment->title }}</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $assessment->type)) }}</td>
-                                        <td>
-                                            {{ date('M d, Y', strtotime($assessment->schedule_date)) }}
-                                            @if($assessment->schedule_time)
-                                                <br>{{ date('h:i A', strtotime($assessment->schedule_time)) }}
-                                            @endif
-                                        </td>
-                                    </tr>
+                                        @php
+                                            $today = now()->toDateString();
+                                            $endOfWeek = now()->endOfWeek()->toDateString();
+                                            if($assessment->schedule_date == $today) $rowClass = 'assessment-today';
+                                            elseif($assessment->schedule_date <= $endOfWeek) $rowClass = 'assessment-week';
+                                            else $rowClass = 'assessment-later';
+                                        @endphp
+                                        <tr class="{{ $rowClass }}">
+                                            <td>{{ $assessment->subject?->code ?? '-' }}</td>
+                                            <td>{{ $assessment->title ?? '-' }}</td>
+                                            <td>{{ ucfirst(str_replace('_',' ',$assessment->type ?? '')) }}</td>
+                                            <td>
+                                                {{ $assessment->schedule_date ? date('M d, Y', strtotime($assessment->schedule_date)) : '-' }}
+                                                @if($assessment->schedule_time)
+                                                    <br>{{ date('h:i A', strtotime($assessment->schedule_time)) }}
+                                                @endif
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                         @if($upcomingAssessments->count() > 5)
-                        <div class="text-center mt-3">
-                            <a href="{{ route('client.schedules.index') }}" class="btn btn-link">View All Schedules</a>
-                        </div>
+                            <div class="text-center mt-3">
+                                <a href="{{ route('client.schedules.index') }}" class="btn btn-link">View All Schedules</a>
+                            </div>
                         @endif
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Scores -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0">Recent Scores</h6>
-                    <a href="{{ route('client.grades.index') }}" class="btn btn-sm btn-accent">View All Grades</a>
-                </div>
-                <div class="card-body">
-                    @if($recentScores->isEmpty())
-                        <p class="text-center">No recent scores available.</p>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Subject</th>
-                                        <th>Assessment</th>
-                                        <th>Type</th>
-                                        <th>Score</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentScores as $score)
-                                    <tr>
-                                        <td>{{ $score->subject_code }}</td>
-                                        <td>{{ $score->assessment_title }}</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $score->assessment_type)) }}</td>
-                                        <td>{{ $score->score }} / {{ $score->max_score }}
-                                            ({{ round(($score->score / $score->max_score) * 100, 2) }}%)</td>
-                                        <td>{{ date('M d, Y', strtotime($score->created_at)) }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                        <p class="text-center">No upcoming assessments scheduled.</p>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Keep modal open if validation errors exist
+    @if($errors->any())
+        var myModal = new bootstrap.Modal(document.getElementById('enrollModal'));
+        myModal.show();
+    @endif
+
+    // Count-up animation for cards
+    document.querySelectorAll('.count-num').forEach(card => {
+        let value = parseInt(card.innerText) || 0;
+        let count = 0;
+        let interval = setInterval(() => {
+            card.innerText = count++;
+            if(count > value) clearInterval(interval);
+        }, 20);
+    });
+</script>
 @endsection

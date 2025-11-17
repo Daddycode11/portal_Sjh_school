@@ -100,7 +100,7 @@ class AdminController extends Controller
             'student_number' => 'required|string|max:255|unique:users,student_number',
             'major'          => 'nullable|string|max:255',
             'sex'            => 'required|in:M,F',
-            'course'         => 'required|string|max:255',
+          /*   'course'         => 'required|string|max:255', */
             'year'           => 'required|string|max:255',
             'password'       => 'required|string|min:8',
         ]);
@@ -110,7 +110,7 @@ class AdminController extends Controller
             'student_number' => $validated['student_number'],
             'major'          => $validated['major'] ?? null,
             'sex'            => $validated['sex'],
-            'course'         => $validated['course'],
+        /*     'course'         => $validated['course'], */
             'year'           => $validated['year'],
             'password'       => Hash::make($validated['password']),
             'user_role'      => 'client', // student
@@ -152,7 +152,7 @@ class AdminController extends Controller
             'student_number' => 'required|string|max:255|unique:users,student_number',
             'major'          => 'nullable|string|max:255',
             'sex'            => 'required|in:M,F',
-            'course'         => 'required|string|max:255',
+          /*   'course'         => 'required|string|max:255', */
             'year'           => 'required|string|max:255',
             'password'       => 'required|string|min:8',
         ]);
@@ -162,7 +162,7 @@ class AdminController extends Controller
             'student_number' => $validated['student_number'],
             'major'          => $validated['major'] ?? null,
             'sex'            => $validated['sex'],
-            'course'         => $validated['course'],
+     /*        'course'         => $validated['course'], */
             'year'           => $validated['year'],
             'password'       => Hash::make($validated['password']),
             'user_role'      => 'faculty',
@@ -187,7 +187,7 @@ class AdminController extends Controller
             'student_number' => 'required|string|max:255|unique:users,student_number,' . $id,
             'major' => 'nullable|string|max:255',
             'sex' => 'required|in:M,F',
-            'course' => 'required|string|max:255',
+          /*   'course' => 'required|string|max:255', */
             'year' => 'required|string|max:255',
         ]);
 
@@ -196,7 +196,7 @@ class AdminController extends Controller
             'student_number' => $validated['student_number'],
             'major' => $validated['major'],
             'sex' => $validated['sex'],
-            'course' => $validated['course'],
+         /*    'course' => $validated['course'], */
             'year' => $validated['year'],
         ]);
 
@@ -465,5 +465,141 @@ class AdminController extends Controller
 
         return redirect()->route('admin.subjects.index')
                          ->with('success','Subject updated successfully!');
+    }
+  // =================================================================
+    // =============== NEW FEATURES BELOW ==============================
+    // =================================================================
+
+    /**
+     * View all Grades (from both teachers and students)
+     */
+    public function viewGrades()
+    {
+        $grades = DB::table('grades')
+            ->join('users as students', 'grades.student_id', '=', 'students.id')
+            ->join('users as teachers', 'grades.faculty_id', '=', 'teachers.id')
+            ->join('subjects', 'grades.subject_id', '=', 'subjects.id')
+            ->select(
+                'grades.*',
+                'students.name as student_name',
+                'teachers.name as teacher_name',
+                'subjects.name as subject_name'
+            )
+            ->orderBy('grades.created_at', 'desc')
+            ->get();
+
+        return view('admin.grades.index', compact('grades'));
+    }
+
+    /**
+     * View Reports (Grades, Attendance, Activities Summary)
+     */
+    public function viewReports()
+    {
+        // You can customize the query later for summaries or analytics
+        $gradeReports = DB::table('grades')->count();
+        $studentCount = User::where('user_role', 'client')->count();
+        $teacherCount = User::where('user_role', 'faculty')->count();
+        $subjectCount = DB::table('subjects')->count();
+
+        return view('admin.reports.index', compact(
+            'gradeReports',
+            'studentCount',
+            'teacherCount',
+            'subjectCount'
+        ));
+    }
+
+    /**
+     * View Enrollment Records
+     */
+    public function viewEnrollment()
+    {
+        $enrollments = DB::table('section_student')
+            ->join('users as students', 'section_student.student_id', '=', 'students.id')
+            ->join('sections', 'section_student.section_id', '=', 'sections.id')
+            ->select(
+                'section_student.*',
+                'students.name as student_name',
+                'sections.name as section_name'
+            )
+            ->orderBy('section_student.created_at', 'desc')
+            ->get();
+
+        return view('admin.enrollment.index', compact('enrollments'));
+    }
+
+    /**
+     * View All Activities (uploaded or assigned by teachers)
+     */
+    public function viewActivities()
+    {
+        $activities = DB::table('activities')
+            ->join('subjects', 'activities.subject_id', '=', 'subjects.id')
+            ->join('users as teachers', 'activities.faculty_id', '=', 'teachers.id')
+            ->select(
+                'activities.*',
+                'subjects.name as subject_name',
+                'teachers.name as teacher_name'
+            )
+            ->orderBy('activities.created_at', 'desc')
+            ->get();
+
+        return view('admin.activities.index', compact('activities'));
+    }
+
+    /**
+     * Manage Users (Admins, Teachers, Students)
+     */
+    public function viewUsers()
+    {
+        $admins = User::where('user_role', 'admin')->get();
+        $teachers = User::where('user_role', 'faculty')->get();
+        $students = User::where('user_role', 'client')->get();
+
+        return view('admin.users.index', compact('admins', 'teachers', 'students'));
+    }
+
+    /**
+     * View and Manage Announcements
+     */
+    public function viewAnnouncements()
+    {
+        $announcements = DB::table('announcements')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.announcements.index', compact('announcements'));
+    }
+
+    public function createAnnouncement()
+    {
+        return view('admin.announcements.create');
+    }
+
+    public function storeAnnouncement(Request $request)
+    {
+        $validated = $request->validate([
+            'title'   => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        DB::table('announcements')->insert([
+            'title'      => $validated['title'],
+            'message'    => $validated['message'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('admin.viewAnnouncements')
+            ->with('success', 'Announcement posted successfully!');
+    }
+
+    public function deleteAnnouncement($id)
+    {
+        DB::table('announcements')->where('id', $id)->delete();
+
+        return redirect()->route('admin.viewAnnouncements')
+            ->with('success', 'Announcement deleted successfully.');
     }
 }

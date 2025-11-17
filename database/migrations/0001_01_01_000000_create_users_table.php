@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('student_number')->unique();
             $table->string('major')->nullable();
             $table->enum('sex', ['F', 'M'])->nullable();
-            $table->string('course')->nullable();
+         /*    $table->string('course')->nullable(); */
             $table->string('year')->nullable();
             $table->string('user_role')->default('client');
             $table->string('password');

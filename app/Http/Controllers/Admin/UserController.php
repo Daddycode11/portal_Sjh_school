@@ -20,7 +20,7 @@ class UserController extends Controller
             'student_number' => 'required|string|unique:users,student_number',
             'major' => 'nullable|string|max:255',
             'sex' => 'nullable|in:M,F',
-            'course' => 'nullable|string|max:255',
+         /*    'course' => 'nullable|string|max:255', */
             'year' => 'nullable|string|max:255',
             'date_of_birth' => 'required|date',
             'age' => 'required|integer',

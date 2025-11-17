@@ -9,15 +9,11 @@ use Illuminate\Support\Facades\Auth;
 class ClientMiddleware
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * Allow only users with user_role === 'client'
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->user_role == 'client') {
+        if (Auth::check() && Auth::user()->user_role === 'client') {
             return $next($request);
         }
 

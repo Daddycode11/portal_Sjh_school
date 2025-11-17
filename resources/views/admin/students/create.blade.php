@@ -21,13 +21,14 @@
     <form action="{{ route('admin.storeStudent') }}" method="POST">
         @csrf
 
-        <!-- name -->
+        <!-- Full Name -->
         <div class="form-group">
             <label for="name">Full Name</label>
             <input type="text"
                    name="name"
                    id="name"
                    class="form-control"
+                   placeholder="Last Name, First Name, Middle Name"
                    value="{{ old('name') }}"
                    required>
         </div>
@@ -63,16 +64,7 @@
             </select>
         </div>
 
-        <!-- course -->
-        <div class="form-group">
-            <label for="course">Course</label>
-            <input type="text"
-                   name="course"
-                   id="course"
-                   class="form-control"
-                   value="{{ old('course') }}"
-                   required>
-        </div>
+        <!-- REMOVED: COURSE -->
 
         <!-- year -->
         <div class="form-group">

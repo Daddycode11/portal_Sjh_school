@@ -32,4 +32,9 @@ class Syllabus extends Model
     {
         return $this->belongsTo(User::class, 'faculty_id');
     }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
 }

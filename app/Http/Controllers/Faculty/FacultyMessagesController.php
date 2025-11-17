@@ -51,7 +51,9 @@ class FacultyMessagesController extends Controller
         $conversationUsers = collect();
 
         foreach ($conversations as $conversation) {
-            $otherId = $conversation->sender_id == $user->id ? $conversation->receiver_id : $conversation->sender_id;
+            $otherId = $conversation->sender_id == $user->id
+                ? $conversation->receiver_id
+                : $conversation->sender_id;
 
             $otherUser = DB::table('users')
                 ->where('id', $otherId)
@@ -62,29 +64,32 @@ class FacultyMessagesController extends Controller
             }
         }
 
-        // Get unread message count
+        // Count unread messages
         $unreadCount = DB::table('messages')
             ->where('receiver_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-        // Mark messages as read for initial display
+        // Mark messages as read when viewing the dashboard
         DB::table('messages')
             ->where('receiver_id', $user->id)
             ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ->update([
+                'is_read' => true,
+                'updated_at' => now(),
+            ]);
 
         return view('faculty.messages.index', compact('students', 'conversationUsers', 'unreadCount'));
     }
 
     /**
-     * Get conversation with a specific user
+     * Get conversation with a specific student
      */
     public function getConversation($userId)
     {
         $user = Auth::user();
 
-        // Check if student is in one of the faculty's classes
+        // Validate if student belongs to this faculty's section(s)
         $isStudent = DB::table('section_subject')
             ->where('faculty_id', $user->id)
             ->join('section_student', function ($join) {
@@ -101,7 +106,7 @@ class FacultyMessagesController extends Controller
             ], 403);
         }
 
-        // Get messages between the two users
+        // Get all messages between faculty and this student
         $messages = DB::table('messages')
             ->where(function ($query) use ($user, $userId) {
                 $query->where('sender_id', $user->id)
@@ -114,12 +119,12 @@ class FacultyMessagesController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Get user details
+        // Fetch student user info
         $otherUser = DB::table('users')
             ->where('id', $userId)
             ->first();
 
-        // Get student's enrolled subjects with this faculty
+        // Fetch subjects shared between faculty and student
         $enrolledSubjects = DB::table('section_subject')
             ->where('faculty_id', $user->id)
             ->join('section_student', function ($join) use ($userId) {
@@ -137,12 +142,15 @@ class FacultyMessagesController extends Controller
             )
             ->get();
 
-        // Mark messages as read
+        // Mark messages as read when opened
         DB::table('messages')
             ->where('sender_id', $userId)
             ->where('receiver_id', $user->id)
             ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ->update([
+                'is_read' => true,
+                'updated_at' => now(),
+            ]);
 
         return response()->json([
             'messages' => $messages,
@@ -163,7 +171,7 @@ class FacultyMessagesController extends Controller
 
         $user = Auth::user();
 
-        // Check if recipient is a student taught by this faculty
+        // Check if faculty teaches this student
         $isTeaching = DB::table('section_subject')
             ->where('faculty_id', $user->id)
             ->join('section_student', function ($join) use ($request) {
@@ -180,14 +188,14 @@ class FacultyMessagesController extends Controller
             ], 403);
         }
 
-        // Save the message
+        // Save the message with content ✅
         $messageId = DB::table('messages')->insertGetId([
             'sender_id' => $user->id,
             'receiver_id' => $request->receiver_id,
-           
+           /*  'content' => $request->content, // ✅ Added content */
             'is_read' => false,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         $message = DB::table('messages')
