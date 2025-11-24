@@ -3,20 +3,17 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IsAdmin
 {
-    /**
-     * Handle an incoming request.
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if (Auth::check() && Auth::user()->role === 'admin') {
             return $next($request);
         }
 
-        // Optionally redirect to dashboard with error
-        return redirect('/')->with('error', 'Unauthorized access.');
+        return redirect('/'); // or abort(403)
     }
 }

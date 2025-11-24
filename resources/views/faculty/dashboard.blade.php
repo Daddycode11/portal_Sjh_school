@@ -215,7 +215,7 @@
                         <h3 class="card-title"><i class="fas fa-bullhorn"></i> Announcements</h3>
                     </div>
                     <div class="card-body" style="max-height: 350px; overflow-y: auto;">
-                        @forelse($announcements as $announcement)
+                        @forelse($announcements ?? [] as $announcement)
                             <div class="border-bottom pb-2 mb-3">
                                 <h5 class="text-success mb-1">{{ $announcement->title }}</h5>
                                 <p class="text-muted small">{{ $announcement->content }}</p>

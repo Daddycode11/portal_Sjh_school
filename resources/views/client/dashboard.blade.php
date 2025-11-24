@@ -6,26 +6,48 @@
 <style>
     body {
         font-family: 'Poppins', 'Roboto', sans-serif;
-        background-color: #f5fff5;
+        background-color: #f3fff8; /* very light mint */
     }
 
-    /* Dashboard Cards */
-    .dashboard-card {
-        background-color: #4CAF50;
+    /* Header Bar */
+    .card-header {
+        background-color: #388E3C !important; /* medium green */
         color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        font-weight: 600;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    /* Dashboard Card Shades (light → dark) */
+    .dashboard-card:nth-child(1) {
+        background: linear-gradient(135deg, #A5D6A7, #81C784); /* light green */
+    }
+    .dashboard-card:nth-child(2) {
+        background: linear-gradient(135deg, #81C784, #66BB6A); 
+    }
+    .dashboard-card:nth-child(3) {
+        background: linear-gradient(135deg, #66BB6A, #4CAF50);
+    }
+    .dashboard-card:nth-child(4) {
+        background: linear-gradient(135deg, #4CAF50, #388E3C); /* deeper green */
+    }
+
+    .dashboard-card {
+        color: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        transition: 0.3s ease;
         min-height: 150px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem;
+        padding: 1.2rem;
     }
 
     .dashboard-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 12px 22px rgba(0,0,0,0.18);
     }
 
     .dashboard-card h6 {
@@ -43,46 +65,51 @@
 
     .dashboard-icon {
         opacity: 0.9;
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
 
+    /* Button Accent */
+    .btn-accent,
+    .btn-success {
+        background-color: #66BB6A !important;
+        border-color: #66BB6A !important;
+        color: #fff;
+        border-radius: 30px;
+        padding: 0.45rem 1.2rem;
+        transition: 0.3s ease;
+    }
+
+    .btn-accent:hover,
+    .btn-success:hover {
+        background-color: #81C784 !important;
+        border-color: #81C784 !important;
+        color: #fff;
+    }
+
+    /* Table Hover */
+    .table-hover tbody tr:hover {
+        background-color: #e9f7ee;
+    }
+
+    /* Badge */
     .badge-unread {
         font-size: 0.7rem;
         vertical-align: top;
         margin-left: 5px;
     }
 
-    /* Table Hover Effects */
-    .table-hover tbody tr:hover {
-        background-color: #e8f5e9;
-    }
-
-    /* Card Headers */
-    .card-header {
-        background-color: #4CAF50;
-        color: #fff;
-        font-weight: 600;
-        border-top-left-radius: 12px !important;
-        border-top-right-radius: 12px !important;
-    }
-
-    /* Accent Button */
-    .btn-accent {
-        background-color: #4CAF50;
-        color: #fff;
-        border-radius: 30px;
-        transition: all 0.3s ease;
-    }
-    .btn-accent:hover {
-        background-color: #43A047;
-        color: #fff;
-    }
-
     /* Assessment Color Coding */
-    .assessment-today { background-color: #d4edda !important; } /* green */
-    .assessment-week { background-color: #fff3cd !important; } /* yellow */
-    .assessment-later { background-color: #e2e3e5 !important; } /* gray */
+    .assessment-today {
+        background-color: #d4edda !important;
+    }
+    .assessment-week {
+        background-color: #fff3cd !important;
+    }
+    .assessment-later {
+        background-color: #e2e3e5 !important;
+    }
 </style>
+
 @endsection
 
 @section('content')

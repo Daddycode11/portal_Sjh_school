@@ -559,9 +559,25 @@ class AdminController extends Controller
 
         return view('admin.users.index', compact('admins', 'teachers', 'students'));
     }
+/**
+ * Show the admin dashboard
+ */
+public function dashboard()
+{
+    // Get latest 5 announcements
+    $announcements = DB::table('announcements')
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+
+    // Example: total users
+    $totalUsers = DB::table('users')->count();
+
+    return view('admin.dashboard', compact('announcements', 'totalUsers'));
+}
 
     /**
-     * View and Manage Announcements
+     * View and manage all announcements
      */
     public function viewAnnouncements()
     {
@@ -572,11 +588,17 @@ class AdminController extends Controller
         return view('admin.announcements.index', compact('announcements'));
     }
 
+    /**
+     * Show create announcement form
+     */
     public function createAnnouncement()
     {
         return view('admin.announcements.create');
     }
 
+    /**
+     * Store a new announcement
+     */
     public function storeAnnouncement(Request $request)
     {
         $validated = $request->validate([
@@ -595,6 +617,9 @@ class AdminController extends Controller
             ->with('success', 'Announcement posted successfully!');
     }
 
+    /**
+     * Delete an announcement
+     */
     public function deleteAnnouncement($id)
     {
         DB::table('announcements')->where('id', $id)->delete();

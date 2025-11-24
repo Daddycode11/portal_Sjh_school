@@ -14,85 +14,40 @@
         </div>
     @endif
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <form action="{{ route('admin.storeStudent') }}" method="POST">
+    <form action="{{ route('admin.students.store') }}" method="POST">
         @csrf
 
-        <!-- Full Name -->
-        <div class="form-group">
+        <div class="form-group mb-3">
             <label for="name">Full Name</label>
-            <input type="text"
-                   name="name"
-                   id="name"
-                   class="form-control"
-                   placeholder="Last Name, First Name, Middle Name"
-                   value="{{ old('name') }}"
-                   required>
+            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
         </div>
 
-        <!-- student_number -->
-        <div class="form-group">
-            <label for="student_number">Student Number</label>
-            <input type="text"
-                   name="student_number"
-                   id="student_number"
-                   class="form-control"
-                   value="{{ old('student_number') }}"
-                   required>
+        <div class="form-group mb-3">
+            <label for="student_id">Student ID</label>
+            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
         </div>
 
-        <!-- major (optional) -->
-        <div class="form-group">
+        <div class="form-group mb-3">
             <label for="major">Major</label>
-            <input type="text"
-                   name="major"
-                   id="major"
-                   class="form-control"
-                   value="{{ old('major') }}">
+            <input type="text" name="major" class="form-control" value="{{ old('major') }}">
         </div>
 
-        <!-- sex: M or F -->
-        <div class="form-group">
-            <label for="sex">Sex</label>
-            <select name="sex" id="sex" class="form-control" required>
+        <div class="form-group mb-3">
+            <label for="gender">Gender</label>
+            <select name="gender" class="form-control" required>
                 <option value="">-- Select --</option>
-                <option value="M" {{ old('sex')=='M' ? 'selected' : '' }}>Male</option>
-                <option value="F" {{ old('sex')=='F' ? 'selected' : '' }}>Female</option>
+                <option value="Male" {{ old('gender')=='Male' ? 'selected' : '' }}>Male</option>
+                <option value="Female" {{ old('gender')=='Female' ? 'selected' : '' }}>Female</option>
             </select>
         </div>
 
-        <!-- REMOVED: COURSE -->
-
-        <!-- year -->
-        <div class="form-group">
-            <label for="year">Year</label>
-            <input type="text"
-                   name="year"
-                   id="year"
-                   class="form-control"
-                   value="{{ old('year') }}"
-                   required>
+        <div class="form-group mb-3">
+            <label for="grade_level">Grade Level</label>
+            <input type="text" name="grade_level" class="form-control" value="{{ old('grade_level') }}" required>
         </div>
 
-        <!-- password -->
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password"
-                   name="password"
-                   id="password"
-                   class="form-control"
-                   required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Add Student
-        </button>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
-            Cancel
-        </a>
+        <button type="submit" class="btn btn-primary">Add Student</button>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 @endsection

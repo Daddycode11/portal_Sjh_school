@@ -44,8 +44,8 @@
                 <!-- Manage Faculty -->
                 <li class="nav-item">
                     <a href="{{ route('admin.faculty.index') }}"
-                        class="nav-link {{ request()->routeIs('admin.faculty.*') ? 'active' : '' }}"
-                        style="{{ request()->routeIs('admin.faculty.*') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
+                        class="nav-link {{ request()->routeIs('admin.faculty.index') ? 'active' : '' }}"
+                        style="{{ request()->routeIs('admin.faculty.index') ? 'background-color: #66BB6A; color: #fff;' : 'color: #fff;' }}">
                         <i class="nav-icon fas fa-chalkboard-teacher text-white"></i>
                         <p>Manage Faculty</p>
                     </a>

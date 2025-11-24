@@ -27,7 +27,7 @@ use App\Http\Controllers\StudentEnrollmentController;
 use App\Http\Controllers\Admin\AdminEnrollmentController;  
 use App\Http\Middleware\ClientMiddleware;
 use App\Http\Controllers\AdminDashboardController;
-
+use App\Http\Controllers\AdminStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -217,26 +217,22 @@ Route::get('/enrollments/validate', [EnrollmentController::class, 'validateEnrol
     Route::resource('announcements', AnnouncementController::class);
 
     // Login History
-Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login-history', [AdminController::class, 'loginHistory'])->name('loginHistory');
-});
-});
 
-Route::prefix('admin')->name('admin.')->group(function () {
+    // Grades
     Route::get('/grades', [AdminGradeController::class, 'index'])->name('grades.index');
-});
-Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-});
-///Activity Controller
-Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Activities
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
 });
 
 // -------------------------
 // Admin Faculty Management
 // -------------------------
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
+/* Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('faculty', [FacultyController::class, 'index'])->name('faculty.index');
     Route::get('faculty/create', [FacultyController::class, 'create'])->name('faculty.create');
     Route::post('faculty', [FacultyController::class, 'store'])->name('faculty.store');
@@ -244,7 +240,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::put('faculty/{faculty}', [FacultyController::class, 'update'])->name('faculty.update');
     Route::delete('faculty/{faculty}', [FacultyController::class, 'destroy'])->name('faculty.destroy');
 });
-
+ */
 // -------------------------
 // Faculty Dashboard
 // -------------------------
@@ -311,3 +307,22 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/student/enrollment', function () {
     return view('client.enrollment_form');
 })->middleware('auth')->name('client.enrollment.form');
+
+
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard (optional)
+/*     Route::get('/', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+ */
+
+    // Student Management (RESTful)
+    Route::resource('students', StudentController::class);
+
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('students', AdminStudentController::class);
+});

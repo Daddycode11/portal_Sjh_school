@@ -6,13 +6,22 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Student extends User
 {
-    // Force the table to 'users'
-    protected $table = 'users';
+    protected $table = 'users'; // Use users table
 
-    /**
-     * The "booted" method of the model.
-     * Adds a global scope to automatically filter users with role 'client'
-     */
+    protected $fillable = [
+        'name',
+        'student_id',
+        'major',
+        'gender',
+        'grade_level',
+        'address',
+        'contact_number',
+        'parent_name',
+        'relationship',
+        'parent_contact',
+        'parent_email',
+    ];
+
     protected static function booted()
     {
         static::addGlobalScope('student', function (Builder $query) {

@@ -1,10 +1,50 @@
 @include('admin.layout.header')
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<!-- Apply Poppins Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body, table, th, td, .nav-link, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Smooth table UI */
+    .table th {
+        background-color: #C8E6C9 !important;
+        color: #2E7D32;
+        font-weight: 600;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #eaf7ea !important;
+        transition: 0.3s ease;
+    }
+
+    /* Rounded card */
+    .rounded-3 {
+        border-radius: 16px !important;
+    }
+
+    /* Navbar clean effect */
+    .navbar {
+        background-color: #388E3C !important;
+        border-bottom: none !important;
+    }
+
+    .navbar .nav-link {
+        color: white !important;
+        font-weight: 500;
+    }
+
+    .content-wrapper {
+        background-color: #f3fff7 !important;
+    }
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed" style="background-color: #f3fff7;">
 <div class="wrapper">
 
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light shadow-sm" style="background-color: #388E3C;">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light shadow-sm">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button">
@@ -21,31 +61,27 @@
     @include('admin.layout.sidebar')
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper" style="background-color: #f9fff9;">
+    <div class="content-wrapper">
+        
         <!-- Content Header -->
         <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0 text-success">User Login History</h1>
-                    </div>
-                </div>
+                <h1 class="m-0 text-success fw-bold">User Login History</h1>
             </div>
         </div>
-        <!-- /.content-header -->
 
-        <!-- Main content -->
+        <!-- Main Content -->
         <section class="content">
             <div class="container-fluid">
 
                 @if($histories->isEmpty())
-                    <div class="alert alert-info">No login history found.</div>
+                    <div class="alert alert-info shadow-sm">No login history found.</div>
                 @else
                     <div class="card border-0 shadow-sm rounded-3">
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover align-middle">
-                                    <thead class="table-success">
+                                    <thead>
                                         <tr>
                                             <th>ID</th>
                                             <th>User Name</th>
@@ -73,20 +109,14 @@
 
             </div>
         </section>
-        <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
 
     @include('admin.layout.footer')
-
 </div>
-<!-- ./wrapper -->
 
-<!-- jQuery -->
+<!-- JS Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
 </body>
