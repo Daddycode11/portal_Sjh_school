@@ -6,11 +6,7 @@
 
     @if($errors->any())
         <div class="alert alert-danger">
-            <ul>
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-            </ul>
+            <ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
         </div>
     @endif
 
@@ -18,33 +14,50 @@
         @csrf
 
         <div class="form-group mb-3">
-            <label for="name">Full Name</label>
+            <label>Full Name</label>
             <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
         </div>
 
         <div class="form-group mb-3">
-            <label for="student_id">Student ID</label>
-            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
+            <label>Student Number</label>
+            <input type="text" name="student_number" class="form-control" value="{{ old('student_number') }}" required>
         </div>
 
         <div class="form-group mb-3">
-            <label for="major">Major</label>
+            <label>Student ID (optional)</label>
+            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}">
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Major (optional)</label>
             <input type="text" name="major" class="form-control" value="{{ old('major') }}">
         </div>
 
         <div class="form-group mb-3">
-            <label for="gender">Gender</label>
+            <label>Gender</label>
             <select name="gender" class="form-control" required>
                 <option value="">-- Select --</option>
-                <option value="Male" {{ old('gender')=='Male' ? 'selected' : '' }}>Male</option>
-                <option value="Female" {{ old('gender')=='Female' ? 'selected' : '' }}>Female</option>
+                <option value="M" {{ old('gender')=='M' ? 'selected' : '' }}>Male</option>
+                <option value="F" {{ old('gender')=='F' ? 'selected' : '' }}>Female</option>
             </select>
         </div>
 
         <div class="form-group mb-3">
-            <label for="grade_level">Grade Level</label>
+            <label>Grade Level</label>
             <input type="text" name="grade_level" class="form-control" value="{{ old('grade_level') }}" required>
         </div>
+
+        <div class="form-group mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Confirm Password</label>
+            <input type="password" name="password_confirmation" class="form-control" required>
+        </div>
+
+        <input type="hidden" name="user_role" value="client">
 
         <button type="submit" class="btn btn-primary">Add Student</button>
         <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Cancel</a>

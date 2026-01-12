@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\LoginHistory;
+use App\Http\Controllers\Admin\LoginHistoryController;
 
-class LoginHistoryController extends Controller
-{
-    public function index()
-    {
-        $histories = LoginHistory::with('user')->orderBy('logged_in_at', 'desc')->get();
-        return view('admin.login-history', compact('histories'));
-    }
-}
+Route::prefix('admin')->name('admin.')->group(function() {
+    // Login History page
+    Route::get('/login-history', [LoginHistoryController::class, 'index'])->name('login-history');
+});

@@ -12,15 +12,22 @@ return new class extends Migration
 public function up()
 {
     Schema::table('enrollments', function (Blueprint $table) {
-        $table->foreignId('subject_id')->constrained('subjects')->after('section_id');
+        if (!Schema::hasColumn('enrollments', 'subject_id')) {
+            $table->foreignId('subject_id')->constrained('subjects')->after('section_id');
+        }
     });
 }
+
 
 public function down()
 {
     Schema::table('enrollments', function (Blueprint $table) {
-        $table->dropColumn('subject_id');
+        if (Schema::hasColumn('enrollments', 'subject_id')) {
+            $table->dropForeign(['subject_id']); // drop FK first
+            $table->dropColumn('subject_id');    // then drop the column
+        }
     });
 }
+
 
 };

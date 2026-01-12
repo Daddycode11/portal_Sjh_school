@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Section;
 use App\Models\Enrollment;
+use App\Models\User;
 
 class StudentEnrollmentController extends Controller
 {
@@ -24,7 +25,7 @@ class StudentEnrollmentController extends Controller
      */
     public function getSections($grade)
     {
-        $sections = Section::where('grade_level', $grade)->get(['id', 'name']);
+        $sections = Section::where('grade_level', $grade)->get(['id', 'name', 'strand']);
         return response()->json($sections);
     }
 
@@ -34,13 +35,18 @@ class StudentEnrollmentController extends Controller
     public function submit(Request $request)
     {
         $request->validate([
-            'grade_level' => 'required|string',
-            'section_id'  => 'required|exists:sections,id',
-            'school_year' => 'required|string',
+            'grade_level'   => 'required|string',
+            'section_id'    => 'required|exists:sections,id',
+            'school_year'   => 'required|string',
+            'semester'      => 'required|string',
+            'contact_number'=> 'required|string',
+            'email'         => 'required|email',
         ]);
 
-        // Prevent duplicate enrollment for same student, grade, section
-        $exists = Enrollment::where('student_id', Auth::id())
+        $student = Auth::user(); // current logged-in student
+
+        // Prevent duplicate enrollment
+        $exists = Enrollment::where('student_id', $student->id)
             ->where('grade_level', $request->grade_level)
             ->where('section_id', $request->section_id)
             ->first();
@@ -49,11 +55,18 @@ class StudentEnrollmentController extends Controller
             return redirect()->back()->with('error', 'You are already enrolled in this grade/section.');
         }
 
+        $section = Section::findOrFail($request->section_id);
+
         Enrollment::create([
-            'student_id'  => Auth::id(),
-            'grade_level' => $request->grade_level,
-            'section_id'  => $request->section_id,
-            'school_year' => $request->school_year,
+            'student_id'     => $student->id,
+            'strand'         => $section->strand ?? null,
+            'section'        => $section->name ?? null,
+            'grade_level'    => $request->grade_level,
+            'school_year'    => $request->school_year,
+            'semester'       => $request->semester,
+            'contact_number' => $request->contact_number,
+            'email'          => $request->email,
+            'status'         => 'Pending',
         ]);
 
         return redirect()->back()->with('success', 'Enrollment submitted successfully!');

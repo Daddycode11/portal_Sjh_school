@@ -98,7 +98,8 @@ Route::prefix('admin')->middleware(['auth','admin'])->name('admin.')->group(func
     Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
     // Login History
-    Route::get('/login-history', [LoginHistoryController::class, 'index'])->name('loginHistory');
+    Route::get('/login-history', [LoginHistoryController::class, 'index'])->name('login-history');
+
 });
 Route::prefix('faculty')->middleware(['auth','faculty'])->name('faculty.')->group(function() {
 

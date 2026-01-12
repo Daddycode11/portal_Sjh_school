@@ -15,8 +15,8 @@ class ActivityController extends Controller
     public function index()
     {
         // Dashboard stats
-        $totalStudents = User::where('role', 'student')->count();
-        $totalFaculty = User::where('role', 'faculty')->count();
+        $totalStudents = User::where('user_role', 'student')->count();
+        $totalFaculty = User::where('user_role', 'faculty')->count();
         $totalSubjects = Subject::count();
         $totalSections = Section::count();
 

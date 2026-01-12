@@ -15,12 +15,9 @@ class UserSeeder extends Seeder
             ['student_number' => 'administrator'],
             [
                 'name' => 'Admin',
-                'major' => 'admin',
                 'sex' => 'F',
-                'course' => 'admin',
-                'year' => 'admin',
                 'password' => Hash::make('Admin@123'),
-                'user_role' => 'admin',
+                'user_role' => 'admin', // only include if column exists
             ]
         );
 
@@ -43,12 +40,9 @@ class UserSeeder extends Seeder
                 ['student_number' => $client['student_number']],
                 [
                     'name' => $client['name'],
-                    'major' => 'SC_BSIT',
-                    'course' => 'CHMBAC',
-                    'year' => 'THIRD YEAR',
                     'sex' => $client['sex'],
                     'password' => Hash::make('Client@123'),
-                    'user_role' => 'client',
+                    'user_role' => 'client', // only include if column exists
                 ]
             );
         }

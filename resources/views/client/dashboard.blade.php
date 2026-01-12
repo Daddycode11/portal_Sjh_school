@@ -115,91 +115,98 @@
 @section('content')
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+<!-- Enroll Now Button -->
+<div class="text-end mb-3">
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#enrollModal">
+        📝 Enroll Now
+    </button>
+</div>
 
-    <!-- Enroll Now Button -->
-    <div class="text-end mb-3">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#enrollModal">
-            📝 Enroll Now
-        </button>
-    </div>
+<!-- ENROLLMENT MODAL -->
+<div class="modal fade @if($errors->any() || session('success')) show @endif" 
+     id="enrollModal" tabindex="-1" 
+     aria-labelledby="enrollModalLabel" 
+     aria-hidden="{{ $errors->any() || session('success') ? 'false' : 'true' }}" 
+     style="{{ $errors->any() || session('success') ? 'display:block;' : '' }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📝 Enroll in Senior High School</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
 
-    <!-- ENROLLMENT MODAL -->
-    <div class="modal fade @if($errors->any() || session('success')) show @endif" 
-         id="enrollModal" tabindex="-1" 
-         aria-labelledby="enrollModalLabel" 
-         aria-hidden="{{ $errors->any() || session('success') ? 'false' : 'true' }}" 
-         style="{{ $errors->any() || session('success') ? 'display:block;' : '' }}">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">📝 Enroll in Senior High School</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                    <script>
+                        setTimeout(function(){
+                            window.location.href = "{{ route('client.dashboard') }}";
+                        }, 2000);
+                    </script>
+                @endif
 
-                    <!-- Success Message -->
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                        <script>
-                            setTimeout(function(){
-                                window.location.href = "{{ route('client.dashboard') }}";
-                            }, 2000);
-                        </script>
-                    @endif
+                <form action="{{ route('student.enrollment.submit') }}" method="POST">
+                    @csrf
 
-                   <form action="{{ route('student.enrollment.submit') }}" method="POST">
-    @csrf
-    <div class="mb-3">
-        <label class="form-label">Full Name</label>
-        <input type="text" name="student_name" class="form-control" 
-               value="{{ old('student_name', auth()->user()->name ?? '') }}" required>
-        @error('student_name')<small class="text-danger">{{ $message }}</small>@enderror
-    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Grade Level</label>
+                        <select name="grade_level" class="form-select" required>
+                            <option value="Grade 11" {{ old('grade_level')=='Grade 11' ? 'selected' : '' }}>Grade 11</option>
+                            <option value="Grade 12" {{ old('grade_level')=='Grade 12' ? 'selected' : '' }}>Grade 12</option>
+                        </select>
+                        @error('grade_level')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Strand</label>
+                        <select name="strand" class="form-select" required>
+                            @foreach(['STEM','ABM','HUMSS','GAS','TVL'] as $strand)
+                                <option value="{{ $strand }}" {{ old('strand')==$strand ? 'selected' : '' }}>{{ $strand }}</option>
+                            @endforeach
+                        </select>
+                        @error('strand')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Grade Level</label>
-                            <select name="grade_level" class="form-select" required>
-                                <option value="Grade 11" {{ old('grade_level')=='Grade 11' ? 'selected' : '' }}>Grade 11</option>
-                                <option value="Grade 12" {{ old('grade_level')=='Grade 12' ? 'selected' : '' }}>Grade 12</option>
-                            </select>
-                            @error('grade_level')<small class="text-danger">{{ $message }}</small>@enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Section (optional)</label>
+                        <input type="text" name="section" class="form-control" value="{{ old('section') }}">
+                        @error('section')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Strand</label>
-                            <select name="strand" class="form-select" required>
-                                @foreach(['STEM','ABM','HUMSS','GAS','TVL'] as $strand)
-                                    <option value="{{ $strand }}" {{ old('strand')==$strand ? 'selected' : '' }}>{{ $strand }}</option>
-                                @endforeach
-                            </select>
-                            @error('strand')<small class="text-danger">{{ $message }}</small>@enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Number</label>
+                        <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number') }}" required>
+                        @error('contact_number')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Section (optional)</label>
-                            <input type="text" name="section" class="form-control" value="{{ old('section') }}">
-                            @error('section')<small class="text-danger">{{ $message }}</small>@enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" value="{{ old('email', auth()->user()->email ?? '') }}" required>
+                        @error('email')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Contact Number</label>
-                            <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number') }}" required>
-                            @error('contact_number')<small class="text-danger">{{ $message }}</small>@enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">School Year</label>
+                        <input type="text" name="school_year" class="form-control" value="{{ old('school_year') }}" required>
+                        @error('school_year')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email', auth()->user()->email ?? '') }}" required>
-                            @error('email')<small class="text-danger">{{ $message }}</small>@enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Semester</label>
+                        <select name="semester" class="form-select" required>
+                            <option value="1st" {{ old('semester')=='1st' ? 'selected' : '' }}>1st Semester</option>
+                            <option value="2nd" {{ old('semester')=='2nd' ? 'selected' : '' }}>2nd Semester</option>
+                        </select>
+                        @error('semester')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
-                        <button type="submit" class="btn btn-success">Submit Enrollment</button>
-                    </form>
-                </div>
+                    <button type="submit" class="btn btn-success">Submit Enrollment</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Dashboard Cards -->
     <div class="row mb-4">
