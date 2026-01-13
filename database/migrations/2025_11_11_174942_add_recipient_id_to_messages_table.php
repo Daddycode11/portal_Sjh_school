@@ -12,14 +12,14 @@ return new class extends Migration
   public function up(): void
 {
     Schema::table('messages', function (Blueprint $table) {
-        $table->unsignedBigInteger('recipient_id')->after('id')->nullable();
+        $table->unsignedBigInteger('receiver_id')->after('id')->nullable();
     });
 }
 
 public function down(): void
 {
     Schema::table('messages', function (Blueprint $table) {
-        $table->dropColumn('recipient_id');
+        $table->dropColumn('receiver_id');
     });
 }
 

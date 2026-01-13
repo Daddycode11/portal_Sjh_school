@@ -475,7 +475,7 @@ $(document).ready(function() {
             url: '{{ route('client.messages.send') }}',
             type: 'POST',
             data: {
-                recipient_id: currentRecipientId,
+                receiver_id: currentRecipientId,
                 message: messageText,
                 _token: '{{ csrf_token() }}'
             },

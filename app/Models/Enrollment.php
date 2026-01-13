@@ -10,15 +10,18 @@ class Enrollment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id',        // Add this if you want a relationship
+        'student_id',
         'student_name',
+        'subject_id',
         'grade_level',
         'strand',
         'section',
+        'section_id',
         'contact_number',
         'email',
         'status'
     ];
+
 
     /**
      * Each enrollment belongs to a student.

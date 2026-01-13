@@ -2,68 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Announcement;
-use App\Models\Enrollment;
 use App\Models\Assessment;
 use App\Models\Message;
-use App\Models\Grade;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 
 class StudentDashboardController extends Controller
 {
     public function index()
     {
-        $studentId = Auth::id(); // Default auth
+        $studentId = Auth::id();
 
-        // Total Subjects (unique subjects the student is enrolled in)
-        $totalSubjects = Enrollment::where('student_id', $studentId)
-            ->distinct('subject_id')
-            ->count('subject_id');
+        // Upcoming Assessments (next 3 days)
+        $upcomingAssessments = Assessment::whereNotNull('schedule_date')
+            ->whereBetween('schedule_date', [now(), now()->addDays(3)])
+            ->whereExists(function ($q) use ($studentId) {
+                $q->selectRaw('1')
+                    ->from('section_subject')
+                    ->join('section_student', function ($join) use ($studentId) {
+                        $join->on('section_subject.section_id', '=', 'section_student.section_id')
+                             ->where('section_student.student_id', $studentId);
+                    })
+                    ->whereColumn('section_subject.subject_id', 'assessments.subject_id')
+                    ->whereColumn('section_subject.school_year', 'assessments.school_year')
+                    ->whereColumn('section_subject.semester', 'assessments.semester');
+            })
+            ->with('subject')
+            ->orderBy('schedule_date')
+            ->limit(3)
+            ->get();
 
-        // Total Sections (unique sections the student is enrolled in)
-        $totalSections = Enrollment::where('student_id', $studentId)
-            ->distinct('section_id')
-            ->count('section_id');
+        // Upcoming assessments count
+        $upcomingCount = $upcomingAssessments->count();
 
-        // Unread Messages (assuming messages have 'recipient_id' and 'read' column)
-        $unreadMessages = Message::where('recipient_id', $studentId)
-            ->where('read', false)
+        // Unread Messages
+        $unreadMessagesCount = Message::where('receiver_id', $studentId)
+            ->where('is_read', false)
             ->count();
 
-        // Upcoming Assessments (future assessments for the student)
-        $upcomingAssessments = Assessment::whereHas('section.enrollments', function($query) use ($studentId) {
-                $query->where('student_id', $studentId);
-            })
-            ->whereDate('schedule_date', '>=', now())
-            ->orderBy('schedule_date', 'asc')
-            ->get() ?? collect(); // Ensure it's always a collection
-
-        // Enrollments with related subject, section, and faculty
-        $enrollments = Enrollment::with(['subject', 'section', 'faculty'])
-            ->where('student_id', $studentId)
-            ->get() ?? collect();
-
-        // Recent scores (grades) for this student
-        $recentScores = Grade::where('student_id', $studentId)
+        // Latest 3 messages
+        $recentMessages = Message::where('receiver_id', $studentId)
+            ->with('sender') // assumes you have sender() relationship in Message model
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get() ?? collect();
+            ->limit(3)
+            ->get();
 
-        // Announcements for students or both audiences
-        $announcements = Announcement::whereIn('target_audience', ['students', 'both'])
-            ->orderBy('posted_at', 'desc')
-            ->get() ?? collect();
 
-        // Return view with all variables
-        return view('client.dashboard', [
-            'totalSubjects' => $totalSubjects ?? 0,
-            'totalSections' => $totalSections ?? 0,
-            'unreadMessages' => $unreadMessages ?? 0,
-            'upcomingAssessments' => $upcomingAssessments,
-            'enrollments' => $enrollments,
-            'recentScores' => $recentScores,
-            'announcements' => $announcements,
-        ]);
+        // back logs
+         $recentAssessments = Assessment::upcomingForStudent(Auth::id())->take(3)->get();
+
+
+
+         $unreadMessages = Message::unreadFor(Auth::id())->count();
+
+        return view('client.dashboard', compact(
+            'upcomingAssessments',
+            'upcomingCount',
+            'unreadMessagesCount',
+            'recentMessages',
+            'recentAssessments',
+            'unreadMessages'
+        ));
     }
 }

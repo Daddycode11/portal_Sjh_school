@@ -51,7 +51,7 @@
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
-                    <form action="{{ route('student.enrollment.submit') }}" method="POST">
+                    <form action="{{ route('test.student.enrollment.submit') }}" method="POST">
                         @csrf
 
                         <div class="mb-3">

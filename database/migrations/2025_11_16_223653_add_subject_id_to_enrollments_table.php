@@ -13,7 +13,7 @@ public function up()
 {
     Schema::table('enrollments', function (Blueprint $table) {
         if (!Schema::hasColumn('enrollments', 'subject_id')) {
-            $table->foreignId('subject_id')->constrained('subjects')->after('section_id');
+            $table->foreignId('subject_id')->constrained('subjects')->after('section_id')->nullable();
         }
     });
 }

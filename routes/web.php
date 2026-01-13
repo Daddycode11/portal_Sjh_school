@@ -302,7 +302,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('client.enrollment.form'); // this fixes the error
 
     Route::post('/student/enrollment', [StudentEnrollmentController::class, 'submit'])
-        ->name('student.enrollment.submit');
+        ->name('test.student.enrollment.submit');
 });
 // Student Enrollment Form (full page)
 Route::get('/student/enrollment', function () {

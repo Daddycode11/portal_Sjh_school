@@ -10,20 +10,35 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sender_id',    // user sending the message
-        'receiver_id',  // user receiving the message
-        'content',      // message body
-        'is_read',      // optional: mark as read
+        'sender_id',
+        'receiver_id',
+        'content',
+        'is_read',
     ];
 
-    // Relationships
+    /**
+     * Sender relationship
+     */
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /**
+     * Receiver relationship
+     */
     public function receiver()
     {
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    public function scopeUnreadFor($query, $userId)
+    {
+        return $query->where('receiver_id', $userId)->where('is_read', false);
+    }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('receiver_id', $userId)->with('sender');
     }
 }

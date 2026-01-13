@@ -89,8 +89,8 @@ class ClientController extends Controller
 
         // Get unread messages count
         $unreadMessages = DB::table('messages')
-            ->where('recipient_id', $user->id)
-            ->where('read', false)
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
             ->count();
 
         return view('client.dashboard', compact(

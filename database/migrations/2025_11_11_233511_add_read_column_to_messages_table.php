@@ -16,14 +16,14 @@ return new class extends Migration
 public function up(): void
 {
     Schema::table('messages', function (Blueprint $table) {
-        $table->boolean('read')->default(false)->after('recipient_id');
+        $table->boolean('is_read')->default(false)->after('receiver_id');
     });
 }
 
 public function down(): void
 {
     Schema::table('messages', function (Blueprint $table) {
-        $table->dropColumn('read');
+        $table->dropColumn('is_read');
     });
 }
 

@@ -218,7 +218,7 @@ $(function() {
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
-                recipient_id: recipientId,
+                receiver_id: recipientId,
                 message: message
             },
             success: function(response) {

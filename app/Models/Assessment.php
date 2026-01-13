@@ -32,7 +32,6 @@ class Assessment extends Model
         'schedule_time' => 'datetime',
     ];
 
-    // ✅ Add this:
     public function section()
     {
         return $this->belongsTo(Section::class);
@@ -51,5 +50,18 @@ class Assessment extends Model
     public function scores()
     {
         return $this->hasMany(StudentScore::class);
+    }
+
+    /**
+     * Scope to get upcoming assessments for a specific student
+     */
+    public function scopeUpcomingForStudent($query, $studentId)
+    {
+        return $query->whereHas('section.students', function($q) use ($studentId) {
+            $q->where('section_student.student_id', $studentId);
+        })
+        ->whereNotNull('schedule_date')
+        ->whereBetween('schedule_date', [now(), now()->addDays(3)])
+        ->with('subject');
     }
 }

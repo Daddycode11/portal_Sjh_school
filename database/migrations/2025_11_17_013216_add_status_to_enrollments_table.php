@@ -12,7 +12,7 @@ return new class extends Migration
   public function up(): void
 {
     Schema::table('enrollments', function (Blueprint $table) {
-        $table->string('status')->default('Pending'); // Pending, Approved, Rejected
+        $table->string('status')->default('Pending')->nullable(); // Pending, Approved, Rejected
     });
 }
 
